@@ -1,0 +1,274 @@
+package com.hdu.edu.creditcertificatesystem.contract;
+
+import io.reactivex.Flowable;
+import io.reactivex.functions.Function;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Callable;
+import org.web3j.abi.EventEncoder;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.Bool;
+import org.web3j.abi.datatypes.DynamicStruct;
+import org.web3j.abi.datatypes.Event;
+import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.Utf8String;
+import org.web3j.crypto.Credentials;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.RemoteCall;
+import org.web3j.protocol.core.RemoteFunctionCall;
+import org.web3j.protocol.core.methods.request.EthFilter;
+import org.web3j.protocol.core.methods.response.BaseEventResponse;
+import org.web3j.protocol.core.methods.response.Log;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.tuples.generated.Tuple6;
+import org.web3j.tx.Contract;
+import org.web3j.tx.TransactionManager;
+import org.web3j.tx.gas.ContractGasProvider;
+
+/**
+ * <p>Auto generated code.
+ * <p><strong>Do not modify!</strong>
+ * <p>Please use the <a href="https://docs.web3j.io/command_line.html">web3j command line tools</a>,
+ * or the org.web3j.codegen.SolidityFunctionWrapperGenerator in the
+ * <a href="https://github.com/web3j/web3j/tree/master/codegen">codegen module</a> to update.
+ *
+ * <p>Generated with web3j version 1.4.1.
+ */
+
+/**
+ * @author 阵雨
+ * @version 1.0
+ */
+@SuppressWarnings("rawtypes")
+public class InstitutionContract extends Contract {
+    public static final String BINARY = "608060405260028054905060035534801561001957600080fd5b50611c4f806100296000396000f3fe608060405234801561001057600080fd5b50600436106100935760003560e01c80637a92ca35116100665780637a92ca351461011e578063893e2b711461014e578063b7848e1c14610183578063b86ed4071461019f578063ff145ed8146101cf57610093565b8063465c4105146100985780635006ce32146100c85780636cc97a5d146100e4578063711a681614610100575b600080fd5b6100b260048036038101906100ad91906114c3565b6101ff565b6040516100bf9190611556565b60405180910390f35b6100e260048036038101906100dd91906115a7565b6102dc565b005b6100fe60048036038101906100f99190611726565b6103b6565b005b61010861062d565b60405161011591906118a3565b60405180910390f35b610138600480360381019061013391906118c5565b6107a5565b6040516101459190611556565b60405180910390f35b610168600480360381019061016391906118c5565b6107db565b60405161017a96959493929190611958565b60405180910390f35b61019d60048036038101906101989190611726565b610b5d565b005b6101b960048036038101906101b49190611726565b610d34565b6040516101c691906118a3565b60405180910390f35b6101e960048036038101906101e491906115a7565b611117565b6040516101f691906119e3565b60405180910390f35b6000808390506000839050805182511461021e576000925050506102d6565b60005b82518110156102ce5781818151811061023d5761023c611a05565b5b602001015160f81c60f81b7effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff191683828151811061027d5761027c611a05565b5b602001015160f81c60f81b7effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1916146102bb57600093505050506102d6565b80806102c690611a63565b915050610221565b506001925050505b92915050565b600060028054905090508082106102f357506103b3565b60008290505b6001826103069190611aac565b81101561038057600260018261031c9190611ae0565b8154811061032d5761032c611a05565b5b906000526020600020016002828154811061034b5761034a611a05565b5b9060005260206000200190805461036190611b65565b61036c9291906111c3565b50808061037890611a63565b9150506102f9565b50600280548061039357610392611b97565b5b6001900381819060005260206000200160006103af9190611250565b9055505b50565b600181600001516040516103ca9190611c02565b908152602001604051809103902060009054906101000a900460ff166105555780600082600001516040516103ff9190611c02565b90815260200160405180910390206000820151816000019080519060200190610429929190611290565b506020820151816001019080519060200190610446929190611290565b506040820151816002019080519060200190610463929190611290565b506060820151816003019080519060200190610480929190611290565b50608082015181600401908051906020019061049d929190611290565b5060a08201518160050190805190602001906104ba929190611290565b5090505060018082600001516040516104d39190611c02565b908152602001604051809103902060006101000a81548160ff02191690831515021790555060028160000151908060018154018082558091505060019003906000526020600020016000909190919091509080519060200190610537929190611290565b506003600081548092919061054b90611a63565b919050555061062a565b806000826000015160405161056a9190611c02565b90815260200160405180910390206000820151816000019080519060200190610594929190611290565b5060208201518160010190805190602001906105b1929190611290565b5060408201518160020190805190602001906105ce929190611290565b5060608201518160030190805190602001906105eb929190611290565b506080820151816004019080519060200190610608929190611290565b5060a0820151816005019080519060200190610625929190611290565b509050505b50565b610635611316565b6040518060c001604052806040518060400160405280600381526020017f313131000000000000000000000000000000000000000000000000000000000081525081526020016040518060400160405280600381526020017f313131000000000000000000000000000000000000000000000000000000000081525081526020016040518060400160405280600381526020017f313131000000000000000000000000000000000000000000000000000000000081525081526020016040518060400160405280600381526020017f313131000000000000000000000000000000000000000000000000000000000081525081526020016040518060400160405280600381526020017f313131000000000000000000000000000000000000000000000000000000000081525081526020016040518060400160405280600381526020017f3131310000000000000000000000000000000000000000000000000000000000815250815250905090565b6001818051602081018201805184825260208301602085012081835280955050505050506000915054906101000a900460ff1681565b60008180516020810182018051848252602083016020850120818352809550505050505060009150905080600001805461081490611b65565b80601f016020809104026020016040519081016040528092919081815260200182805461084090611b65565b801561088d5780601f106108625761010080835404028352916020019161088d565b820191906000526020600020905b81548152906001019060200180831161087057829003601f168201915b5050505050908060010180546108a290611b65565b80601f01602080910402602001604051908101604052809291908181526020018280546108ce90611b65565b801561091b5780601f106108f05761010080835404028352916020019161091b565b820191906000526020600020905b8154815290600101906020018083116108fe57829003601f168201915b50505050509080600201805461093090611b65565b80601f016020809104026020016040519081016040528092919081815260200182805461095c90611b65565b80156109a95780601f1061097e576101008083540402835291602001916109a9565b820191906000526020600020905b81548152906001019060200180831161098c57829003601f168201915b5050505050908060030180546109be90611b65565b80601f01602080910402602001604051908101604052809291908181526020018280546109ea90611b65565b8015610a375780601f10610a0c57610100808354040283529160200191610a37565b820191906000526020600020905b815481529060010190602001808311610a1a57829003601f168201915b505050505090806004018054610a4c90611b65565b80601f0160208091040260200160405190810160405280929190818152602001828054610a7890611b65565b8015610ac55780601f10610a9a57610100808354040283529160200191610ac5565b820191906000526020600020905b815481529060010190602001808311610aa857829003601f168201915b505050505090806005018054610ada90611b65565b80601f0160208091040260200160405190810160405280929190818152602001828054610b0690611b65565b8015610b535780601f10610b2857610100808354040283529160200191610b53565b820191906000526020600020905b815481529060010190602001808311610b3657829003601f168201915b5050505050905086565b60018160000151604051610b719190611c02565b908152602001604051809103902060009054906101000a900460ff1615610cf85760008060018360000151604051610ba99190611c02565b908152602001604051809103902060006101000a81548160ff021916908315150217905550600090505b600280549050811015610cb157610c94826000015160028381548110610bfc57610bfb611a05565b5b906000526020600020018054610c1190611b65565b80601f0160208091040260200160405190810160405280929190818152602001828054610c3d90611b65565b8015610c8a5780601f10610c5f57610100808354040283529160200191610c8a565b820191906000526020600020905b815481529060010190602001808311610c6d57829003601f168201915b50505050506101ff565b15610c9e57610cb1565b8080610ca990611a63565b915050610bd3565b610cba816102dc565b7fcdb72d06565be2e6e4048e127d72c0d6cd72635cbae3d499c02100a7cd5c0a896001604051610cea9190611556565b60405180910390a150610d31565b7fcdb72d06565be2e6e4048e127d72c0d6cd72635cbae3d499c02100a7cd5c0a896000604051610d289190611556565b60405180910390a15b50565b610d3c611316565b60018260000151604051610d509190611c02565b908152602001604051809103902060009054906101000a900460ff16156111115760008260000151604051610d859190611c02565b90815260200160405180910390206040518060c0016040529081600082018054610dae90611b65565b80601f0160208091040260200160405190810160405280929190818152602001828054610dda90611b65565b8015610e275780601f10610dfc57610100808354040283529160200191610e27565b820191906000526020600020905b815481529060010190602001808311610e0a57829003601f168201915b50505050508152602001600182018054610e4090611b65565b80601f0160208091040260200160405190810160405280929190818152602001828054610e6c90611b65565b8015610eb95780601f10610e8e57610100808354040283529160200191610eb9565b820191906000526020600020905b815481529060010190602001808311610e9c57829003601f168201915b50505050508152602001600282018054610ed290611b65565b80601f0160208091040260200160405190810160405280929190818152602001828054610efe90611b65565b8015610f4b5780601f10610f2057610100808354040283529160200191610f4b565b820191906000526020600020905b815481529060010190602001808311610f2e57829003601f168201915b50505050508152602001600382018054610f6490611b65565b80601f0160208091040260200160405190810160405280929190818152602001828054610f9090611b65565b8015610fdd5780601f10610fb257610100808354040283529160200191610fdd565b820191906000526020600020905b815481529060010190602001808311610fc057829003601f168201915b50505050508152602001600482018054610ff690611b65565b80601f016020809104026020016040519081016040528092919081815260200182805461102290611b65565b801561106f5780601f106110445761010080835404028352916020019161106f565b820191906000526020600020905b81548152906001019060200180831161105257829003601f168201915b5050505050815260200160058201805461108890611b65565b80601f01602080910402602001604051908101604052809291908181526020018280546110b490611b65565b80156111015780601f106110d657610100808354040283529160200191611101565b820191906000526020600020905b8154815290600101906020018083116110e457829003601f168201915b5050505050815250509050611112565b5b919050565b6002818154811061112757600080fd5b90600052602060002001600091509050805461114290611b65565b80601f016020809104026020016040519081016040528092919081815260200182805461116e90611b65565b80156111bb5780601f10611190576101008083540402835291602001916111bb565b820191906000526020600020905b81548152906001019060200180831161119e57829003601f168201915b505050505081565b8280546111cf90611b65565b90600052602060002090601f0160209004810192826111f1576000855561123f565b82601f10611202578054855561123f565b8280016001018555821561123f57600052602060002091601f016020900482015b8281111561123e578254825591600101919060010190611223565b5b50905061124c919061134c565b5090565b50805461125c90611b65565b6000825580601f1061126e575061128d565b601f01602090049060005260206000209081019061128c919061134c565b5b50565b82805461129c90611b65565b90600052602060002090601f0160209004810192826112be5760008555611305565b82601f106112d757805160ff1916838001178555611305565b82800160010185558215611305579182015b828111156113045782518255916020019190600101906112e9565b5b509050611312919061134c565b5090565b6040518060c001604052806060815260200160608152602001606081526020016060815260200160608152602001606081525090565b5b8082111561136557600081600090555060010161134d565b5090565b6000604051905090565b600080fd5b600080fd5b600080fd5b600080fd5b6000601f19601f8301169050919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b6113d082611387565b810181811067ffffffffffffffff821117156113ef576113ee611398565b5b80604052505050565b6000611402611369565b905061140e82826113c7565b919050565b600067ffffffffffffffff82111561142e5761142d611398565b5b61143782611387565b9050602081019050919050565b82818337600083830152505050565b600061146661146184611413565b6113f8565b90508281526020810184848401111561148257611481611382565b5b61148d848285611444565b509392505050565b600082601f8301126114aa576114a961137d565b5b81356114ba848260208601611453565b91505092915050565b600080604083850312156114da576114d9611373565b5b600083013567ffffffffffffffff8111156114f8576114f7611378565b5b61150485828601611495565b925050602083013567ffffffffffffffff81111561152557611524611378565b5b61153185828601611495565b9150509250929050565b60008115159050919050565b6115508161153b565b82525050565b600060208201905061156b6000830184611547565b92915050565b6000819050919050565b61158481611571565b811461158f57600080fd5b50565b6000813590506115a18161157b565b92915050565b6000602082840312156115bd576115bc611373565b5b60006115cb84828501611592565b91505092915050565b600080fd5b600080fd5b600060c082840312156115f4576115f36115d4565b5b6115fe60c06113f8565b9050600082013567ffffffffffffffff81111561161e5761161d6115d9565b5b61162a84828501611495565b600083015250602082013567ffffffffffffffff81111561164e5761164d6115d9565b5b61165a84828501611495565b602083015250604082013567ffffffffffffffff81111561167e5761167d6115d9565b5b61168a84828501611495565b604083015250606082013567ffffffffffffffff8111156116ae576116ad6115d9565b5b6116ba84828501611495565b606083015250608082013567ffffffffffffffff8111156116de576116dd6115d9565b5b6116ea84828501611495565b60808301525060a082013567ffffffffffffffff81111561170e5761170d6115d9565b5b61171a84828501611495565b60a08301525092915050565b60006020828403121561173c5761173b611373565b5b600082013567ffffffffffffffff81111561175a57611759611378565b5b611766848285016115de565b91505092915050565b600081519050919050565b600082825260208201905092915050565b60005b838110156117a957808201518184015260208101905061178e565b838111156117b8576000848401525b50505050565b60006117c98261176f565b6117d3818561177a565b93506117e381856020860161178b565b6117ec81611387565b840191505092915050565b600060c083016000830151848203600086015261181482826117be565b9150506020830151848203602086015261182e82826117be565b9150506040830151848203604086015261184882826117be565b9150506060830151848203606086015261186282826117be565b9150506080830151848203608086015261187c82826117be565b91505060a083015184820360a086015261189682826117be565b9150508091505092915050565b600060208201905081810360008301526118bd81846117f7565b905092915050565b6000602082840312156118db576118da611373565b5b600082013567ffffffffffffffff8111156118f9576118f8611378565b5b61190584828501611495565b91505092915050565b600082825260208201905092915050565b600061192a8261176f565b611934818561190e565b935061194481856020860161178b565b61194d81611387565b840191505092915050565b600060c0820190508181036000830152611972818961191f565b90508181036020830152611986818861191f565b9050818103604083015261199a818761191f565b905081810360608301526119ae818661191f565b905081810360808301526119c2818561191f565b905081810360a08301526119d6818461191f565b9050979650505050505050565b600060208201905081810360008301526119fd818461191f565b905092915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b6000611a6e82611571565b91507fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff821415611aa157611aa0611a34565b5b600182019050919050565b6000611ab782611571565b9150611ac283611571565b925082821015611ad557611ad4611a34565b5b828203905092915050565b6000611aeb82611571565b9150611af683611571565b9250827fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff03821115611b2b57611b2a611a34565b5b828201905092915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052602260045260246000fd5b60006002820490506001821680611b7d57607f821691505b60208210811415611b9157611b90611b36565b5b50919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603160045260246000fd5b600081905092915050565b6000611bdc8261176f565b611be68185611bc6565b9350611bf681856020860161178b565b80840191505092915050565b6000611c0e8284611bd1565b91508190509291505056fea2646970667358221220021fcdda935f5bfeb3c39dad2e831231c755ce56478dcaee2e01b0645083b62a64736f6c634300080a0033";
+
+    public static final String FUNC_DELETEINSTITUTION = "deleteInstitution";
+
+    public static final String FUNC_GETAINSTITUTIONINFO = "getAInstitutionInfo";
+
+    public static final String FUNC_GETENTITY = "getEntity";
+
+    public static final String FUNC_INSTITUTIONINFOINSERTED = "institutionInfoInserted";
+
+    public static final String FUNC_INSTITUTIONINFOKEY = "institutionInfoKey";
+
+    public static final String FUNC_INSTITUTIONINFOS = "institutionInfos";
+
+    public static final String FUNC_ISEQUAL = "isEqual";
+
+    public static final String FUNC_REMOVEINSTITUTIONINFOKEYATINDEX = "removeInstitutionInfoKeyAtIndex";
+
+    public static final String FUNC_SAVE = "save";
+
+    public static final Event DELETEMSG_EVENT = new Event("DeleteMsg",
+            Arrays.<TypeReference<?>>asList(new TypeReference<Bool>() {}));
+    ;
+
+    @Deprecated
+    protected InstitutionContract(String contractAddress, Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit) {
+        super(BINARY, contractAddress, web3j, credentials, gasPrice, gasLimit);
+    }
+
+    protected InstitutionContract(String contractAddress, Web3j web3j, Credentials credentials, ContractGasProvider contractGasProvider) {
+        super(BINARY, contractAddress, web3j, credentials, contractGasProvider);
+    }
+
+    @Deprecated
+    protected InstitutionContract(String contractAddress, Web3j web3j, TransactionManager transactionManager, BigInteger gasPrice, BigInteger gasLimit) {
+        super(BINARY, contractAddress, web3j, transactionManager, gasPrice, gasLimit);
+    }
+
+    protected InstitutionContract(String contractAddress, Web3j web3j, TransactionManager transactionManager, ContractGasProvider contractGasProvider) {
+        super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
+    }
+
+    public List<DeleteMsgEventResponse> getDeleteMsgEvents(TransactionReceipt transactionReceipt) {
+        List<Contract.EventValuesWithLog> valueList = extractEventParametersWithLog(DELETEMSG_EVENT, transactionReceipt);
+        ArrayList<DeleteMsgEventResponse> responses = new ArrayList<DeleteMsgEventResponse>(valueList.size());
+        for (Contract.EventValuesWithLog eventValues : valueList) {
+            DeleteMsgEventResponse typedResponse = new DeleteMsgEventResponse();
+            typedResponse.log = eventValues.getLog();
+            typedResponse.code = (Boolean) eventValues.getNonIndexedValues().get(0).getValue();
+            responses.add(typedResponse);
+        }
+        return responses;
+    }
+
+    public Flowable<DeleteMsgEventResponse> deleteMsgEventFlowable(EthFilter filter) {
+        return web3j.ethLogFlowable(filter).map(new Function<Log, DeleteMsgEventResponse>() {
+            @Override
+            public DeleteMsgEventResponse apply(Log log) {
+                Contract.EventValuesWithLog eventValues = extractEventParametersWithLog(DELETEMSG_EVENT, log);
+                DeleteMsgEventResponse typedResponse = new DeleteMsgEventResponse();
+                typedResponse.log = log;
+                typedResponse.code = (Boolean) eventValues.getNonIndexedValues().get(0).getValue();
+                return typedResponse;
+            }
+        });
+    }
+
+    public Flowable<DeleteMsgEventResponse> deleteMsgEventFlowable(DefaultBlockParameter startBlock, DefaultBlockParameter endBlock) {
+        EthFilter filter = new EthFilter(startBlock, endBlock, getContractAddress());
+        filter.addSingleTopic(EventEncoder.encode(DELETEMSG_EVENT));
+        return deleteMsgEventFlowable(filter);
+    }
+
+    public RemoteFunctionCall<TransactionReceipt> deleteInstitution(InstitutionInfo _institution) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(
+                FUNC_DELETEINSTITUTION,
+                Arrays.<Type>asList(_institution),
+                Collections.<TypeReference<?>>emptyList());
+        return executeRemoteCallTransaction(function);
+    }
+
+    public RemoteFunctionCall<InstitutionInfo> getAInstitutionInfo() {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETAINSTITUTIONINFO,
+                Arrays.<Type>asList(),
+                Arrays.<TypeReference<?>>asList(new TypeReference<InstitutionInfo>() {}));
+        return executeRemoteCallSingleValueReturn(function, InstitutionInfo.class);
+    }
+
+    public RemoteFunctionCall<InstitutionInfo> getEntity(InstitutionInfo _institution) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETENTITY,
+                Arrays.<Type>asList(_institution),
+                Arrays.<TypeReference<?>>asList(new TypeReference<InstitutionInfo>() {}));
+        return executeRemoteCallSingleValueReturn(function, InstitutionInfo.class);
+    }
+
+    public RemoteFunctionCall<Boolean> institutionInfoInserted(String param0) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_INSTITUTIONINFOINSERTED,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(param0)),
+                Arrays.<TypeReference<?>>asList(new TypeReference<Bool>() {}));
+        return executeRemoteCallSingleValueReturn(function, Boolean.class);
+    }
+
+    public RemoteFunctionCall<String> institutionInfoKey(BigInteger param0) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_INSTITUTIONINFOKEY,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.generated.Uint256(param0)),
+                Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}));
+        return executeRemoteCallSingleValueReturn(function, String.class);
+    }
+
+    public RemoteFunctionCall<Tuple6<String, String, String, String, String, String>> institutionInfos(String param0) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_INSTITUTIONINFOS,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(param0)),
+                Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Utf8String>() {}));
+        return new RemoteFunctionCall<Tuple6<String, String, String, String, String, String>>(function,
+                new Callable<Tuple6<String, String, String, String, String, String>>() {
+                    @Override
+                    public Tuple6<String, String, String, String, String, String> call() throws Exception {
+                        List<Type> results = executeCallMultipleValueReturn(function);
+                        return new Tuple6<String, String, String, String, String, String>(
+                                (String) results.get(0).getValue(),
+                                (String) results.get(1).getValue(),
+                                (String) results.get(2).getValue(),
+                                (String) results.get(3).getValue(),
+                                (String) results.get(4).getValue(),
+                                (String) results.get(5).getValue());
+                    }
+                });
+    }
+
+    public RemoteFunctionCall<Boolean> isEqual(String a, String b) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_ISEQUAL,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(a),
+                        new org.web3j.abi.datatypes.Utf8String(b)),
+                Arrays.<TypeReference<?>>asList(new TypeReference<Bool>() {}));
+        return executeRemoteCallSingleValueReturn(function, Boolean.class);
+    }
+
+    public RemoteFunctionCall<TransactionReceipt> removeInstitutionInfoKeyAtIndex(BigInteger index) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(
+                FUNC_REMOVEINSTITUTIONINFOKEYATINDEX,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.generated.Uint256(index)),
+                Collections.<TypeReference<?>>emptyList());
+        return executeRemoteCallTransaction(function);
+    }
+
+    public RemoteFunctionCall<TransactionReceipt> save(InstitutionInfo _institution) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(
+                FUNC_SAVE,
+                Arrays.<Type>asList(_institution),
+                Collections.<TypeReference<?>>emptyList());
+        return executeRemoteCallTransaction(function);
+    }
+
+    @Deprecated
+    public static InstitutionContract load(String contractAddress, Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit) {
+        return new InstitutionContract(contractAddress, web3j, credentials, gasPrice, gasLimit);
+    }
+
+    @Deprecated
+    public static InstitutionContract load(String contractAddress, Web3j web3j, TransactionManager transactionManager, BigInteger gasPrice, BigInteger gasLimit) {
+        return new InstitutionContract(contractAddress, web3j, transactionManager, gasPrice, gasLimit);
+    }
+
+    public static InstitutionContract load(String contractAddress, Web3j web3j, Credentials credentials, ContractGasProvider contractGasProvider) {
+        return new InstitutionContract(contractAddress, web3j, credentials, contractGasProvider);
+    }
+
+    public static InstitutionContract load(String contractAddress, Web3j web3j, TransactionManager transactionManager, ContractGasProvider contractGasProvider) {
+        return new InstitutionContract(contractAddress, web3j, transactionManager, contractGasProvider);
+    }
+
+    public static RemoteCall<InstitutionContract> deploy(Web3j web3j, Credentials credentials, ContractGasProvider contractGasProvider) {
+        return deployRemoteCall(InstitutionContract.class, web3j, credentials, contractGasProvider, BINARY, "");
+    }
+
+    @Deprecated
+    public static RemoteCall<InstitutionContract> deploy(Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit) {
+        return deployRemoteCall(InstitutionContract.class, web3j, credentials, gasPrice, gasLimit, BINARY, "");
+    }
+
+    public static RemoteCall<InstitutionContract> deploy(Web3j web3j, TransactionManager transactionManager, ContractGasProvider contractGasProvider) {
+        return deployRemoteCall(InstitutionContract.class, web3j, transactionManager, contractGasProvider, BINARY, "");
+    }
+
+    @Deprecated
+    public static RemoteCall<InstitutionContract> deploy(Web3j web3j, TransactionManager transactionManager, BigInteger gasPrice, BigInteger gasLimit) {
+        return deployRemoteCall(InstitutionContract.class, web3j, transactionManager, gasPrice, gasLimit, BINARY, "");
+    }
+
+    public static class InstitutionInfo extends DynamicStruct {
+        public String id;
+
+        public String institutionName;
+
+        public String institutionPhone;
+
+        public String institutionEmail;
+
+        public String institutionPlace;
+
+        public String authorCertificatePic;
+
+        public InstitutionInfo(String id, String institutionName, String institutionPhone, String institutionEmail, String institutionPlace, String authorCertificatePic) {
+            super(new org.web3j.abi.datatypes.Utf8String(id),new org.web3j.abi.datatypes.Utf8String(institutionName),new org.web3j.abi.datatypes.Utf8String(institutionPhone),new org.web3j.abi.datatypes.Utf8String(institutionEmail),new org.web3j.abi.datatypes.Utf8String(institutionPlace),new org.web3j.abi.datatypes.Utf8String(authorCertificatePic));
+            this.id = id;
+            this.institutionName = institutionName;
+            this.institutionPhone = institutionPhone;
+            this.institutionEmail = institutionEmail;
+            this.institutionPlace = institutionPlace;
+            this.authorCertificatePic = authorCertificatePic;
+        }
+
+        public InstitutionInfo(Utf8String id, Utf8String institutionName, Utf8String institutionPhone, Utf8String institutionEmail, Utf8String institutionPlace, Utf8String authorCertificatePic) {
+            super(id,institutionName,institutionPhone,institutionEmail,institutionPlace,authorCertificatePic);
+            this.id = id.getValue();
+            this.institutionName = institutionName.getValue();
+            this.institutionPhone = institutionPhone.getValue();
+            this.institutionEmail = institutionEmail.getValue();
+            this.institutionPlace = institutionPlace.getValue();
+            this.authorCertificatePic = authorCertificatePic.getValue();
+        }
+    }
+
+    public static class DeleteMsgEventResponse extends BaseEventResponse {
+        public Boolean code;
+    }
+}
