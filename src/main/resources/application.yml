@@ -1,1 +1,16 @@
+server:
+  port: 8090
 
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/lease
+    username: root
+    password: cyb1255210
+
+# 合约配置
+contract:
+  credentials: 4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d
+  http-service: HTTP://127.0.0.1:8545
+  gas-price: 2000000
+  gas-limit: 6721975
