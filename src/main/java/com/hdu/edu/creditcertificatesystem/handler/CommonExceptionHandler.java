@@ -21,7 +21,7 @@ public class CommonExceptionHandler {
      * 通用异常处理
      *
      * @param e 异常信息
-     * @return
+     * @return BaseGenericsResponse<String> 返回信息
      */
     @ExceptionHandler(BaseException.class)
     public BaseGenericsResponse<String> handleBaseException(BaseException e) {

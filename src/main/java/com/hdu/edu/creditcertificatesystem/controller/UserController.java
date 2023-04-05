@@ -28,7 +28,8 @@ public class UserController {
     /**
      * 登录
      *
-     * @return
+     * @param userInfoRequest 请求
+     * @return BaseGenericsResponse<LoginInfoDTO>
      */
     @PostMapping("/login")
     public BaseGenericsResponse<LoginInfoDTO> login(UserInfoRequest userInfoRequest) {

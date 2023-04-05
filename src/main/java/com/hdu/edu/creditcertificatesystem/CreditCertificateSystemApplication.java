@@ -14,7 +14,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
  */
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@MapperScan("com.hdu.edu.creditcertificatesystem")
+@MapperScan("com.hdu.edu.creditcertificatesystem.mapper")
 public class CreditCertificateSystemApplication {
 
     public static void main(String[] args) {
