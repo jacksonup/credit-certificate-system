@@ -30,11 +30,6 @@ public class UserInfoDTO {
     private Integer role;
 
     /**
-     * 创建时间
-     */
-    private Integer createTime;
-
-    /**
      * 手机号
      */
     private String phone;

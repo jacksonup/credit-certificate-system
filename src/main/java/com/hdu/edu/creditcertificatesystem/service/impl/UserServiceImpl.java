@@ -1,11 +1,13 @@
 package com.hdu.edu.creditcertificatesystem.service.impl;
 
 import com.hdu.edu.creditcertificatesystem.contract.UserContract;
+import com.hdu.edu.creditcertificatesystem.enums.ContractTypeEnum;
 import com.hdu.edu.creditcertificatesystem.mapstruct.UserInfoConvert;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.UserInfoDTO;
 import com.hdu.edu.creditcertificatesystem.pojo.request.UserInfoRequest;
 import com.hdu.edu.creditcertificatesystem.property.ContractProperties;
 import com.hdu.edu.creditcertificatesystem.service.UserService;
+import com.hdu.edu.creditcertificatesystem.spring.ContractLoader;
 import com.hdu.edu.creditcertificatesystem.util.ValidatorUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 /**
  * 用户信息
@@ -25,6 +28,7 @@ import javax.annotation.PostConstruct;
  */
 @Slf4j
 @Service("userService")
+@ContractLoader(value = ContractTypeEnum.USER)
 public class UserServiceImpl implements UserService {
     @Setter(onMethod_ = @Autowired)
     private UserInfoConvert baseConvert;
@@ -35,31 +39,26 @@ public class UserServiceImpl implements UserService {
     private UserContract userContract;
 
     /**
-     * 调用智能合约
+     * {@inheritDoc}
      */
-    @PostConstruct
-    private void init() {
-        // 监听本地链
-        Web3j web3j = Web3j.build(new HttpService(contractProperties.getHttpService()));
-
-        // 生成资格凭证
-        Credentials credentials = Credentials.create(contractProperties.getCredentials());
-
-
-
+    @Override
+    public UserInfoDTO getDTO(UserInfoRequest userInfoRequest) throws Exception {
+        ValidatorUtils.validateEntity(userInfoRequest);
+        return baseConvert.convert(userContract.getEntity(baseConvert.convert(userInfoRequest)).send());
     }
 
     /**
-     * 获取DTO
-     *
-     * @param userInfoRequest 用户请求
-     * @return
+     * {@inheritDoc}
      */
     @Override
-    public UserInfoDTO getDTO(UserInfoRequest userInfoRequest) {
-        ValidatorUtils.validateEntity(userInfoRequest);
-        userContract.getEntity(baseConvert.convert(userInfoRequest));
+    public List<UserInfoDTO> getList(UserInfoRequest userInfoRequest) {
 
         return null;
+    }
+
+    @Override
+    public void test() {
+        System.out.println(userContract.getContractAddress());
+        log.info("进入test");
     }
 }

@@ -19,7 +19,7 @@ public class UserInfoConvertImpl implements UserInfoConvert {
     /**
      * Request转Entity
      *
-     * @param request Request
+     * @param request 业务请求
      * @return Entity
      */
     @Override
@@ -42,6 +42,11 @@ public class UserInfoConvertImpl implements UserInfoConvert {
      */
     @Override
     public UserInfoDTO convert(UserContract.UserInfo entity) {
-        return null;
+        UserInfoDTO userInfoDTO = new UserInfoDTO();
+        userInfoDTO.setAccount(entity.getAccount());
+        userInfoDTO.setRole(entity.getRole().intValue());
+        userInfoDTO.setPhone(entity.getPhone());
+        userInfoDTO.setEmail(entity.getEmail());
+        return userInfoDTO;
     }
 }
