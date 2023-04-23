@@ -15,7 +15,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
@@ -103,8 +102,6 @@ public class ContractLoaderAdvice {
                 }
             }
         }
-
-
         return joinPoint.proceed();
     }
 }

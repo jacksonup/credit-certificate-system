@@ -42,6 +42,4 @@ public enum ContractTypeEnum {
     public static ContractTypeEnum getByKey(String key) {
         return KEY_MAP.get(key);
     }
-
-
 }
