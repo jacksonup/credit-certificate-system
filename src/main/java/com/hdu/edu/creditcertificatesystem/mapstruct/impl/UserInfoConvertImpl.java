@@ -7,6 +7,7 @@ import com.hdu.edu.creditcertificatesystem.pojo.request.UserInfoRequest;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * 用户信息转换类实现
@@ -48,5 +49,10 @@ public class UserInfoConvertImpl implements UserInfoConvert {
         userInfoDTO.setPhone(entity.getPhone());
         userInfoDTO.setEmail(entity.getEmail());
         return userInfoDTO;
+    }
+
+    @Override
+    public List<UserInfoDTO> list(List<UserContract.UserInfo> list) {
+        return null;
     }
 }
