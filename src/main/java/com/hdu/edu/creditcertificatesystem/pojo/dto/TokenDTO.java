@@ -5,22 +5,27 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 登录信息DTO
+ * token 实体
  *
  * @author chenyb46701
- * @date 2023/4/3
+ * @date 2023/3/13
  */
 @Getter
 @Setter
 @ToString
-public class LoginInfoDTO {
+public class TokenDTO {
     /**
-     * 登录令牌
+     * 账号
      */
-    private String token;
+    private String account;
 
     /**
      * 角色
      */
     private Integer role;
+
+    /**
+     * 时间
+     */
+    private String time;
 }
