@@ -15,6 +15,10 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.StaticGasProvider;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @SpringBootTest
 @Slf4j
@@ -49,8 +53,23 @@ class CreditCertificateSystemApplicationTests {
         UserContract userContract = UserContract.deploy(web3j, credentials, provider).send();
         // 存储合约地址到redis中
         redisValueOperations.set(ContractTypeEnum.USER.getValue(), userContract.getContractAddress());
-        log.info("用户合约地址为{}", redisValueOperations.get(ContractTypeEnum.USER.getValue()));
-        // 部署合约
-    }
 
+        // 创建初始化管理员账户
+
+        // 获取当前时间
+        LocalDateTime localDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        for (int i = 0; i < 5; i++) {
+            UserContract.UserInfo userInfo = new UserContract.UserInfo(
+                   "admin" + i,
+                   "admin" + i,
+                    new BigInteger("0"),
+                    new BigInteger(localDateTime.format(formatter)),
+                    "",
+                    ""
+            );
+            userContract.save(userInfo).send();
+        }
+        log.info("合约部署成功!");
+    }
 }

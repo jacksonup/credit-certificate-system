@@ -13,7 +13,7 @@ spring:
 
 # 合约配置
 contract:
-  credentials: 940163ca029b156ff227a3e1fc7f17d9f6c7a8c79e998a4f00968426cc0fe95a
+  credentials: 4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d
   http-service: HTTP://127.0.0.1:8545
   gas-price: 2000000
   gas-limit: 6721975
