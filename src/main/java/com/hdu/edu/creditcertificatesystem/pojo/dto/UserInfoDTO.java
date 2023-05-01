@@ -38,4 +38,9 @@ public class UserInfoDTO {
      * 邮箱
      */
     private String email;
+
+    /**
+     * 创建时间
+     */
+    private String createTime;
 }

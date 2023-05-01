@@ -11,7 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class UserInfoRequest extends BaseRequest{
+public class UserInfoRequest extends BaseRequest {
     /**
      * 账号
      */

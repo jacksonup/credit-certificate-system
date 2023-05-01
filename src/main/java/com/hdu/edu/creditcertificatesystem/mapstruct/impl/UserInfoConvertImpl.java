@@ -7,6 +7,8 @@ import com.hdu.edu.creditcertificatesystem.pojo.request.UserInfoRequest;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -48,6 +50,11 @@ public class UserInfoConvertImpl implements UserInfoConvert {
         userInfoDTO.setRole(entity.getRole().intValue());
         userInfoDTO.setPhone(entity.getPhone());
         userInfoDTO.setEmail(entity.getEmail());
+
+        // 格式化时间
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        LocalDateTime dateTime = LocalDateTime.parse(entity.getCreateTime().toString(), formatter);
+        userInfoDTO.setCreateTime(dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         return userInfoDTO;
     }
 
