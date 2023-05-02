@@ -30,10 +30,10 @@ public class UserInfoConvertImpl implements UserInfoConvert {
         return new UserContract.UserInfo(
                 request.getAccount(),
                 request.getPassword(),
-                new BigInteger(String.valueOf(request.getRole())),
-                new BigInteger(String.valueOf(request.getCreateTime())),
-                request.getPhone(),
-                request.getEmail()
+                new BigInteger(String.valueOf(request.getRole() == null ? 999 : request.getRole())),
+                new BigInteger(String.valueOf(request.getCreateTime() == null ? 999 : request.getCreateTime())),
+                request.getPhone() == null ? "" : request.getPhone(),
+                request.getEmail() == null ? "" : request.getEmail()
         );
     }
 
@@ -47,6 +47,7 @@ public class UserInfoConvertImpl implements UserInfoConvert {
     public UserInfoDTO convert(UserContract.UserInfo entity) {
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         userInfoDTO.setAccount(entity.getAccount());
+        userInfoDTO.setPassword(entity.getPassword());
         userInfoDTO.setRole(entity.getRole().intValue());
         userInfoDTO.setPhone(entity.getPhone());
         userInfoDTO.setEmail(entity.getEmail());

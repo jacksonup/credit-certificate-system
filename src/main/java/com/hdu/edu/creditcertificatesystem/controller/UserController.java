@@ -11,10 +11,11 @@ import com.hdu.edu.creditcertificatesystem.pojo.request.InstitutionRequest;
 import com.hdu.edu.creditcertificatesystem.pojo.request.PageRequest;
 import com.hdu.edu.creditcertificatesystem.pojo.request.UserInfoRequest;
 import com.hdu.edu.creditcertificatesystem.pojo.response.BaseGenericsResponse;
+import com.hdu.edu.creditcertificatesystem.service.InstitutionService;
 import com.hdu.edu.creditcertificatesystem.service.UserService;
+import com.hdu.edu.creditcertificatesystem.spring.CloudComponent;
 import com.hdu.edu.creditcertificatesystem.spring.Permission;
 import com.hdu.edu.creditcertificatesystem.util.JwtUtils;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -32,10 +33,15 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/user")
+@ResponseBody
+@CloudComponent
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class UserController {
     @Setter(onMethod_ = @Autowired)
     private UserService userService;
+
+    @Setter(onMethod_ = @Autowired)
+    private InstitutionService institutionService;
 
     /**
      * 登录
@@ -85,7 +91,7 @@ public class UserController {
      * @param pageRequest 分页请求
      * @return 用户信息DTO列表
      */
-    @GetMapping("/user/all")
+    @GetMapping("/all")
     @Permission(role = {RolePermissionEnum.ADMIN})
     public BaseGenericsResponse<List<UserInfoDTO>> getAllUser(PageRequest pageRequest) throws Exception {
         return BaseGenericsResponse.successBaseResp(userService.getListPage(pageRequest));
@@ -97,9 +103,10 @@ public class UserController {
      * @param pageRequest 分页请求
      * @return 机构信息实体类
      */
-    @GetMapping("/user/institution/all")
-    public BaseGenericsResponse<InstitutionDTO> getAllInstitution(PageRequest pageRequest) {
-        return null;
+    @GetMapping("/institution/all")
+    @Permission(role = {RolePermissionEnum.ADMIN, RolePermissionEnum.INSTITUTE_MANAGER})
+    public BaseGenericsResponse<List<InstitutionDTO>> getAllInstitution(PageRequest pageRequest) throws Exception {
+        return BaseGenericsResponse.successBaseResp(institutionService.getListPage(pageRequest));
     }
 
     /**
@@ -108,9 +115,9 @@ public class UserController {
      * @param institutionRequest 机构信息请求
      * @return 审核通过信息
      */
-    @PostMapping("institution/apply")
+    @PostMapping("/institution/apply")
     public BaseGenericsResponse<String> apply(InstitutionRequest institutionRequest) {
-
+        // 判断该机构名状态
         return null;
     }
 }

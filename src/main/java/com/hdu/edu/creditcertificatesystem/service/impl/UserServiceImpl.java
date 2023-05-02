@@ -36,7 +36,6 @@ import java.util.List;
 @Slf4j
 @Service("userService")
 @ContractLoader(value = ContractTypeEnum.USER)
-@CloudComponent
 public class UserServiceImpl implements UserService {
     @Setter(onMethod_ = @Autowired)
     private UserInfoConvert baseConvert;
@@ -51,7 +50,6 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserInfoDTO getDTO(UserInfoRequest userInfoRequest) throws Exception {
-        ValidatorUtils.validateEntity(userInfoRequest);
         return baseConvert.convert(userContract.getEntity(baseConvert.convert(userInfoRequest)).send());
     }
 
