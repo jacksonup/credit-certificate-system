@@ -5,6 +5,7 @@ import com.hdu.edu.creditcertificatesystem.pojo.response.BaseGenericsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 全局异常捕获.
@@ -24,6 +25,7 @@ public class CommonExceptionHandler {
      * @return BaseGenericsResponse<String> 返回信息
      */
     @ExceptionHandler(BaseException.class)
+    @ResponseBody
     public BaseGenericsResponse<String> handleBaseException(BaseException e) {
         BaseGenericsResponse<String> response = new BaseGenericsResponse<>();
         response.setCode(e.getErrorCode());
