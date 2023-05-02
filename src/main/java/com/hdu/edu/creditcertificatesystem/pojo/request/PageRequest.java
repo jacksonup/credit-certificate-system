@@ -18,4 +18,14 @@ public class PageRequest extends BaseRequest{
      * 开始下标
      */
     private Integer from;
+
+    /**
+     * 分页查询扩展字段-角色
+     */
+    private Integer role;
+
+    /**
+     * 分页查询扩展字段-部门
+     */
+    private Integer sectorId;
 }

@@ -73,6 +73,7 @@
             <artifactId>mysql-connector-j</artifactId>
             <version>8.0.31</version>
         </dependency>
+
         <!--    token    -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -146,9 +147,16 @@
             <artifactId>validation-api</artifactId>
             <version>${jakarta-validation.version}</version>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>4.1.2</version>
         </dependency>
     </dependencies>
 

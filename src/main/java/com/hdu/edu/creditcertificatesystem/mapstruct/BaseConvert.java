@@ -9,7 +9,7 @@ import java.util.List;
  * @author chenyb46701
  * @date 2023/4/3
  */
-public interface BaseConvert<E extends DynamicStruct, R extends BaseRequest, D> {
+public interface BaseConvert<E extends DynamicStruct, R extends BaseRequest, D, EX> {
     /**
      * Request转Entity
      *
