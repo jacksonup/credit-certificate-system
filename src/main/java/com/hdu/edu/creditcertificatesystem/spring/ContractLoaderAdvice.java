@@ -1,6 +1,7 @@
 package com.hdu.edu.creditcertificatesystem.spring;
 
 import com.hdu.edu.creditcertificatesystem.constant.ErrorCodeConstant;
+import com.hdu.edu.creditcertificatesystem.contract.InstitutionContract;
 import com.hdu.edu.creditcertificatesystem.contract.UserContract;
 import com.hdu.edu.creditcertificatesystem.enums.ContractTypeEnum;
 import com.hdu.edu.creditcertificatesystem.exception.BaseException;
@@ -76,30 +77,33 @@ public class ContractLoaderAdvice {
             // 获取被代理的 Service 实例
             Object serviceTarget = joinPoint.getTarget();
             for (ContractTypeEnum typeEnum : contractLoader.value()) {
+                log.info("正在加载:{}合约", typeEnum.getValue());
+
+                // 获取用户合约的地址
+                final String address = redisValueOperations.get(typeEnum.getValue());
+                if (StringUtils.isBlank(address)) {
+                    log.error("用户合约未部署!");
+                    throw new BaseException(ErrorCodeConstant.NO_EXIST_CODE, "用户合约未部署!");
+                }
+
+                // 获取该实例中的 userContract 字段
+                Field contractField = serviceTarget.getClass().getDeclaredField(typeEnum.getValue());
+
+                // 解除私有字段的限制
+                contractField.setAccessible(true);
                 switch (typeEnum) {
                     case USER:
-                        log.info("正在加载用户合约...");
-                        // 获取用户合约的地址
-                        final String address = redisValueOperations.get(ContractTypeEnum.USER.getValue());
-                        if (StringUtils.isBlank(address)) {
-                            log.error("用户合约未部署!");
-                            throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "用户合约未部署!");
-                        }
-
-                        // 获取该实例中的 userContract 字段
-                        Field userContractField = serviceTarget.getClass().getDeclaredField(ContractTypeEnum.USER.getValue());
-
-                        // 解除私有字段的限制
-                        userContractField.setAccessible(true);
-
-                        // 设置该字段的值为合约实例
-                        userContractField.set(serviceTarget, UserContract.load(address, web3j, credentials, provider));
-                        log.info("加载用户合约成功!");
+                        contractField.set(serviceTarget, UserContract.load(address, web3j, credentials, provider));
                         break;
                     case TEACHER:
                         // 加载教师合约
+                    case INSTITUTION:
+                        contractField.set(serviceTarget, InstitutionContract.load(address, web3j, credentials, provider));
+                        break;
                     default:
                 }
+
+                log.info("加载:{}合约成功", typeEnum.getValue());
             }
         }
         return joinPoint.proceed();
