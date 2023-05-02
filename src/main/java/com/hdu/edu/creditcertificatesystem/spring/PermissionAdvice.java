@@ -11,6 +11,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,15 +24,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class PermissionAdvice {
-    @Pointcut("@annoation(com.hdu.edu.creditcertificatesystem.spring.Permission)")
+    @Pointcut("@annotation(com.hdu.edu.creditcertificatesystem.spring.Permission)")
     public void rolePointCut() {
     }
 
-    @Before(value = "rolePointCut()")
+    @Before("rolePointCut()")
     public void checkRolePermission(JoinPoint joinPoint) {
         log.info("正在进行角色权限校验");
 
-        final Object target = joinPoint.getTarget();
         final Object[] args = joinPoint.getArgs();
         int role = -1;
         boolean flag = false;
@@ -44,7 +44,9 @@ public class PermissionAdvice {
             }
         }
 
-        final Permission permission = target.getClass().getAnnotation(Permission.class);
+        // 获取方法上注解的属性
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        final Permission permission = signature.getMethod().getAnnotation(Permission.class);
         if (permission != null) {
             // 获取角色列表
             final RolePermissionEnum[] roleEnums = permission.role();
