@@ -2,10 +2,7 @@ package com.hdu.edu.creditcertificatesystem.controller;
 
 import com.hdu.edu.creditcertificatesystem.constant.ErrorCodeConstant;
 import com.hdu.edu.creditcertificatesystem.enums.RolePermissionEnum;
-import com.hdu.edu.creditcertificatesystem.pojo.dto.InstitutionDTO;
-import com.hdu.edu.creditcertificatesystem.pojo.dto.LoginInfoDTO;
-import com.hdu.edu.creditcertificatesystem.pojo.dto.TokenDTO;
-import com.hdu.edu.creditcertificatesystem.pojo.dto.UserInfoDTO;
+import com.hdu.edu.creditcertificatesystem.pojo.dto.*;
 import com.hdu.edu.creditcertificatesystem.pojo.request.BaseRequest;
 import com.hdu.edu.creditcertificatesystem.pojo.request.InstitutionRequest;
 import com.hdu.edu.creditcertificatesystem.pojo.request.PageRequest;
@@ -21,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -117,7 +115,68 @@ public class UserController {
      */
     @PostMapping("/institution/apply")
     public BaseGenericsResponse<String> apply(InstitutionRequest institutionRequest) {
-        // 判断该机构名状态
+        return null;
+    }
+
+    /**
+     * 导入学生
+     *
+     * @param baseRequest 基础请求
+     * @param file 学生文件
+     * @return 导入信息
+     */
+    @PostMapping("/student/import")
+    @Permission(role = {RolePermissionEnum.ADMIN, RolePermissionEnum.EDUCATIONAL_MANAGER})
+    public BaseGenericsResponse<String> importStudent(BaseRequest baseRequest, @RequestParam("file") MultipartFile file) {
+        userService.importStudent(file);
+        return BaseGenericsResponse.successBaseResp("导入成功");
+    }
+
+    /**
+     * 分页获取学生
+     *
+     * @param pageRequest 分页请求
+     * @return 学生信息列表
+     */
+    @GetMapping("/student/all")
+    public BaseGenericsResponse<List<StudentInfoDTO>> getAllStudent(PageRequest pageRequest) {
+        return null;
+    }
+
+    /**
+     * 导入教师
+     *
+     * @param baseRequest 通用请求
+     * @param file 教师文件
+     * @return 导入信息
+     */
+    @PostMapping("/teacher/import")
+    @Permission(role = {RolePermissionEnum.ADMIN})
+    public BaseGenericsResponse<String> importTeacher(BaseRequest baseRequest, @RequestParam("file") MultipartFile file) {
+        return null;
+    }
+
+    /**
+     * 分页按角色获取教师
+     *
+     * @param pageRequest 分页请求
+     * @return 教师信息列表
+     */
+    @PostMapping("/teacher/byRole")
+    @Permission(role = {RolePermissionEnum.ADMIN})
+    public BaseGenericsResponse<List<TeacherInfoDTO>> getTeacherInfoListByRole(PageRequest pageRequest) {
+        return null;
+    }
+
+    /**
+     * 分页按部门Id获取教师
+     *
+     * @param pageRequest 分页请求
+     * @return 教师信息列表
+     */
+    @PostMapping("/teacher/bySector")
+    @Permission(role = {RolePermissionEnum.ADMIN})
+    public BaseGenericsResponse<List<TeacherInfoDTO>> getTeacherInfoListBySectorId(PageRequest pageRequest) {
         return null;
     }
 }
