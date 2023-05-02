@@ -55,8 +55,6 @@ class CreditCertificateSystemApplicationTests {
         redisValueOperations.set(ContractTypeEnum.USER.getValue(), userContract.getContractAddress());
 
         // 创建初始化管理员账户
-
-        // 获取当前时间
         LocalDateTime localDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         for (int i = 0; i < 5; i++) {

@@ -17,32 +17,37 @@ import java.util.List;
 @ToString
 public class InstitutionDTO {
     /**
-     *
+     * 主键
      */
-    public String id;
+    private String id;
 
     /**
      * 机构名
      */
-    public String institutionName;
+    private String institutionName;
 
     /**
      * 电话
      */
-    public String institutionPhone;
+    private String institutionPhone;
 
     /**
      * 邮箱
      */
-    public String institutionEmail;
+    private String institutionEmail;
 
     /**
      * 地址
      */
-    public String institutionPlace;
+    private String institutionPlace;
 
     /**
      * 证明图片URL列表
      */
-    public List<String> authorCertificatePic;
+    private List<String> authorCertificatePic;
+
+    /**
+     * 创建时间
+     */
+    private String createTime;
 }
