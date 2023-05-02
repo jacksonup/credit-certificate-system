@@ -127,7 +127,7 @@ public class UserController {
      */
     @PostMapping("/student/import")
     @Permission(role = {RolePermissionEnum.ADMIN, RolePermissionEnum.EDUCATIONAL_MANAGER})
-    public BaseGenericsResponse<String> importStudent(BaseRequest baseRequest, @RequestParam("file") MultipartFile file) {
+    public BaseGenericsResponse<String> importStudent(BaseRequest baseRequest, @RequestParam("file") MultipartFile file) throws Exception {
         userService.importStudent(file);
         return BaseGenericsResponse.successBaseResp("导入成功");
     }

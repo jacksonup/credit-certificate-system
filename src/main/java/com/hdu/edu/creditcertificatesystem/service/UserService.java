@@ -3,6 +3,8 @@ package com.hdu.edu.creditcertificatesystem.service;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.UserInfoDTO;
 import com.hdu.edu.creditcertificatesystem.pojo.request.PageRequest;
 import com.hdu.edu.creditcertificatesystem.pojo.request.UserInfoRequest;
+import com.hdu.edu.creditcertificatesystem.pojo.response.BaseGenericsResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -45,5 +47,17 @@ public interface UserService {
      */
     List<Integer> getCountsByRole() throws Exception;
 
-    void test();
+    /**
+     * 导入用户
+     *
+     * @param file 文件
+     */
+    void importStudent(MultipartFile file) throws Exception;
+
+    /**
+     * 保存
+     *
+     * @param userInfoRequest 用户信息
+     */
+    void save(UserInfoRequest userInfoRequest) throws Exception;
 }
