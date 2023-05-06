@@ -1,7 +1,6 @@
 package com.hdu.edu.creditcertificatesystem.enums;
 
 import lombok.Getter;
-import org.checkerframework.checker.units.qual.K;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,14 +19,9 @@ public enum AuditTypeEnum {
     WAIT_AUDIT(0, "待审核"),
 
     /**
-     * 已驳回
-     */
-    REJECT(1, "驳回"),
-
-    /**
      * 已通过
      */
-    ACCESS(2, "已通过");
+    ACCESS(1, "已通过");
 
     public static Map<Integer, AuditTypeEnum> getKeyMap() {
         return KEY_MAP;
