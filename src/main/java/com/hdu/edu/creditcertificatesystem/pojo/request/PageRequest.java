@@ -28,4 +28,9 @@ public class PageRequest extends BaseRequest{
      * 分页查询扩展字段-部门
      */
     private Integer sectorId;
+
+    /**
+     * 分页查询扩展字段-状态
+     */
+    private Integer status;
 }
