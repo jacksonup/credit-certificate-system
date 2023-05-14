@@ -4,6 +4,7 @@ import com.hdu.edu.creditcertificatesystem.contract.UserContract;
 import com.hdu.edu.creditcertificatesystem.mapstruct.UserInfoConvert;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.UserInfoDTO;
 import com.hdu.edu.creditcertificatesystem.pojo.request.UserInfoRequest;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -37,6 +38,11 @@ public class UserInfoConvertImpl implements UserInfoConvert {
         );
     }
 
+    @Override
+    public ObjectUtils.Null convertEx(UserInfoRequest request) {
+        return null;
+    }
+
     /**
      * Entity转DTO
      *
@@ -62,5 +68,20 @@ public class UserInfoConvertImpl implements UserInfoConvert {
     @Override
     public List<UserInfoDTO> list(List<UserContract.UserInfo> list) {
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserInfoRequest one(UserInfoDTO userInfoDTO) {
+        UserInfoRequest userInfoRequest = new UserInfoRequest();
+        userInfoRequest.setAccount(userInfoDTO.getAccount());
+        userInfoRequest.setPassword(userInfoDTO.getPassword());
+        userInfoRequest.setPhone(userInfoRequest.getPhone());
+        userInfoRequest.setEmail(userInfoRequest.getEmail());
+        userInfoRequest.setRole(userInfoDTO.getRole());
+        userInfoRequest.setCreateTime(userInfoDTO.getCreateTime());
+        return userInfoRequest;
     }
 }

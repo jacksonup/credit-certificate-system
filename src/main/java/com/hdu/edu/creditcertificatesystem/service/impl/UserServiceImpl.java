@@ -21,18 +21,13 @@ import com.hdu.edu.creditcertificatesystem.util.ExcelUtils;
 import com.hdu.edu.creditcertificatesystem.util.ValidatorUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.http.HttpService;
 
-import javax.annotation.PostConstruct;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -64,16 +59,29 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserInfoDTO getDTO(UserInfoRequest userInfoRequest) throws Exception {
-        return baseConvert.convert(userContract.getEntity(baseConvert.convert(userInfoRequest)).send());
+        final UserInfoDTO userInfoDTO = baseConvert.convert(userContract.getEntity(baseConvert.convert(userInfoRequest)).send());
+        if (ObjectUtils.isEmpty(userInfoDTO)) {
+            log.info("用户不存在");
+            throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "用户不存在");
+        }
+        return userInfoDTO;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<UserInfoDTO> getList(UserInfoRequest userInfoRequest) {
-
-        return null;
+    public List<UserInfoDTO> getList(UserInfoRequest userInfoRequest) throws Exception {
+        final List<UserContract.UserInfo> list = userContract.getAll().send();
+        if (CollectionUtils.isEmpty(list)) {
+            log.error("无数据");
+            throw new BaseException(ErrorCodeConstant.NO_EXIST_CODE, "无数据");
+        }
+        List<UserInfoDTO> result = new ArrayList<>();
+        for (UserContract.UserInfo userInfo : list) {
+            result.add(baseConvert.convert(userInfo));
+        }
+        return result;
     }
 
     /**
