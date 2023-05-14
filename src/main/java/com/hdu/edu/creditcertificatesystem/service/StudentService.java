@@ -2,6 +2,7 @@ package com.hdu.edu.creditcertificatesystem.service;
 
 import com.hdu.edu.creditcertificatesystem.enums.ContractTypeEnum;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.StudentInfoDTO;
+import com.hdu.edu.creditcertificatesystem.pojo.request.PageRequest;
 import com.hdu.edu.creditcertificatesystem.pojo.request.StudentInfoRequest;
 import com.hdu.edu.creditcertificatesystem.spring.ContractLoader;
 
@@ -15,7 +16,7 @@ import java.util.List;
  */
 @ContractLoader(value = ContractTypeEnum.STUDENT)
 public interface StudentService {
-    List<StudentInfoDTO> getList(StudentInfoRequest studentInfoRequest);
+    List<StudentInfoDTO> getListPage(PageRequest pageRequest);
 
     /**
      * 保存

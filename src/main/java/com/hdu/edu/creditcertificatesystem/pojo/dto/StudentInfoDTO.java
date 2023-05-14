@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+
 /**
  * 学生信息DTO
  *
@@ -14,5 +15,83 @@ import lombok.ToString;
 @Setter
 @ToString
 public class StudentInfoDTO {
+    /**
+     * 学号
+     */
+    private String account;
 
+    /**
+     * 姓名
+     */
+    private String name;
+
+    /**
+     * 性别
+     */
+    private String sexual;
+
+    /**
+     * 籍贯
+     */
+    private String nativePlace;
+
+    /**
+     * 院系
+     */
+    private String department;
+
+    /**
+     * 专业
+     */
+    private String major;
+
+    /**
+     * 班级
+     */
+    private String grade;
+
+    /**
+     * 学历
+     */
+    private String educationBg;
+
+    /**
+     * 担任职务
+     */
+    private String position;
+
+    /**
+     * 政治面貌
+     */
+    private String politicalOutlook;
+
+    /**
+     * 证件照路径
+     */
+    private String IDPhoto;
+
+    /**
+     * 生源地
+     */
+    private String birthPlace;
+
+    /**
+     * 出生日期yyyy-MM-dd
+     */
+    private String birthday;
+
+    /**
+     * 入学时间yyyyMMdd
+     */
+    private String entranceTime;
+
+    /**
+     * 电话
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
 }

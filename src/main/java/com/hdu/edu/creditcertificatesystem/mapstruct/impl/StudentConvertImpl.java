@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
- * 学生信息转换器实现嘞
+ * 学生信息转换器实现类
  *
  * @author chenyb46701
  * @date 2023/5/2
