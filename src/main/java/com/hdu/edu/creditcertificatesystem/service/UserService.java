@@ -30,7 +30,7 @@ public interface UserService {
      * @param userInfoRequest 用户信息请求
      * @return List<UserInfoDTO> 用户信息列表
      */
-    List<UserInfoDTO> getList(UserInfoRequest userInfoRequest);
+    List<UserInfoDTO> getList(UserInfoRequest userInfoRequest) throws Exception;
 
     /**
      * 分页获取List
