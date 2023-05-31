@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 
 /**
  * 学生信息DTO
@@ -94,4 +96,9 @@ public class StudentInfoDTO {
      * 邮箱
      */
     private String email;
+
+    /**
+     * 课程信息列表
+     */
+    private List<CourseInfoDTO> courses;
 }

@@ -6,7 +6,6 @@ import com.hdu.edu.creditcertificatesystem.pojo.request.BaseRequest;
 import com.hdu.edu.creditcertificatesystem.util.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

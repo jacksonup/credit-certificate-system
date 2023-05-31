@@ -3,9 +3,9 @@ package com.hdu.edu.creditcertificatesystem.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.hdu.edu.creditcertificatesystem.constant.ErrorCodeConstant;
-import com.hdu.edu.creditcertificatesystem.entity.ClassInfo;
+import com.hdu.edu.creditcertificatesystem.contract.TeacherContract;
 import com.hdu.edu.creditcertificatesystem.entity.DepartmentInfo;
-import com.hdu.edu.creditcertificatesystem.entity.MajorInfo;
+import com.hdu.edu.creditcertificatesystem.enums.ContractTypeEnum;
 import com.hdu.edu.creditcertificatesystem.exception.BaseException;
 import com.hdu.edu.creditcertificatesystem.mapper.DepartmentInfoMapper;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.DepartmentInfoDTO;
@@ -13,6 +13,7 @@ import com.hdu.edu.creditcertificatesystem.pojo.request.BaseRequest;
 import com.hdu.edu.creditcertificatesystem.pojo.request.DepartmentRequest;
 import com.hdu.edu.creditcertificatesystem.pojo.response.BaseGenericsResponse;
 import com.hdu.edu.creditcertificatesystem.service.DepartmentService;
+import com.hdu.edu.creditcertificatesystem.spring.ContractLoader;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -31,9 +33,12 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@ContractLoader(value = ContractTypeEnum.TEACHER)
 public class DepartmentServiceImpl implements DepartmentService {
     @Setter(onMethod_ = @Autowired)
     private DepartmentInfoMapper departmentInfoMapper;
+
+    private TeacherContract teacherContract;
 
     /**
      * {@inheritDoc}
@@ -63,17 +68,28 @@ public class DepartmentServiceImpl implements DepartmentService {
      * {@inheritDoc}
      */
     @Override
-    public BaseGenericsResponse<List<DepartmentInfoDTO>> getAllList(BaseRequest baseRequest) {
+    public BaseGenericsResponse<List<DepartmentInfoDTO>> getAllList(BaseRequest baseRequest) throws Exception {
         final List<DepartmentInfo> departmentInfoList = departmentInfoMapper.selectList(new QueryWrapper<>());
         List<DepartmentInfoDTO> departmentInfoDTOList = new ArrayList<>();
+
+        // 查询部门内的人数
+        final List<TeacherContract.TeacherInfo> teacherInfoList = teacherContract.getAll().send();
+        HashMap<String, Integer> map = new HashMap<>();
+        for (TeacherContract.TeacherInfo teacherInfo : teacherInfoList) {
+            final String departmentName = teacherInfo.getDepartment();
+            if (map.containsKey(departmentName)) {
+                map.put(departmentName, map.get(departmentName) + 1);
+            } else {
+                map.put(departmentName, 1);
+            }
+        }
         if (CollectionUtils.isNotEmpty(departmentInfoList)) {
             for (DepartmentInfo departmentInfo : departmentInfoList) {
+                final String departmentName = departmentInfo.getDepartmentName();
                 DepartmentInfoDTO departmentInfoDTO = new DepartmentInfoDTO();
                 departmentInfoDTO.setId(departmentInfo.getId());
-                departmentInfoDTO.setDepartmentName(departmentInfo.getDepartmentName());
-
-                // 查询部门内的人数
-
+                departmentInfoDTO.setDepartmentName(departmentName);
+                departmentInfoDTO.setCount(map.getOrDefault(departmentName, 0));
                 departmentInfoDTOList.add(departmentInfoDTO);
             }
         }

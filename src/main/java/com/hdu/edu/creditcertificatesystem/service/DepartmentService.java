@@ -28,5 +28,5 @@ public interface DepartmentService {
      * @param baseRequest 通用请求
      * @return 部门DTO列表
      */
-    BaseGenericsResponse<List<DepartmentInfoDTO>> getAllList(BaseRequest baseRequest);
+    BaseGenericsResponse<List<DepartmentInfoDTO>> getAllList(BaseRequest baseRequest) throws Exception;
 }

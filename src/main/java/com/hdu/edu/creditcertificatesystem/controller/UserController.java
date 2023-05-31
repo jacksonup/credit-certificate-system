@@ -4,14 +4,9 @@ import com.hdu.edu.creditcertificatesystem.constant.ErrorCodeConstant;
 import com.hdu.edu.creditcertificatesystem.enums.RolePermissionEnum;
 import com.hdu.edu.creditcertificatesystem.mapstruct.UserInfoConvert;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.*;
-import com.hdu.edu.creditcertificatesystem.pojo.request.BaseRequest;
-import com.hdu.edu.creditcertificatesystem.pojo.request.InstitutionRequest;
-import com.hdu.edu.creditcertificatesystem.pojo.request.PageRequest;
-import com.hdu.edu.creditcertificatesystem.pojo.request.UserInfoRequest;
+import com.hdu.edu.creditcertificatesystem.pojo.request.*;
 import com.hdu.edu.creditcertificatesystem.pojo.response.BaseGenericsResponse;
-import com.hdu.edu.creditcertificatesystem.service.InstitutionService;
-import com.hdu.edu.creditcertificatesystem.service.StudentService;
-import com.hdu.edu.creditcertificatesystem.service.UserService;
+import com.hdu.edu.creditcertificatesystem.service.*;
 import com.hdu.edu.creditcertificatesystem.spring.CloudComponent;
 import com.hdu.edu.creditcertificatesystem.spring.Permission;
 import com.hdu.edu.creditcertificatesystem.util.JwtUtils;
@@ -43,10 +38,16 @@ public class UserController {
     private UserService userService;
 
     @Setter(onMethod_ = @Autowired)
-    private StudentService studentService;
+    private TeacherService teacherService;
 
     @Setter(onMethod_ = @Autowired)
     private InstitutionService institutionService;
+
+    @Setter(onMethod_ = @Autowired)
+    private StudentService studentService;
+
+    @Setter(onMethod_ = @Autowired)
+    private CourseInfoService courseInfoService;
 
     @Setter(onMethod_ = @Autowired)
     private UserInfoConvert baseConvert;
@@ -101,29 +102,6 @@ public class UserController {
     }
 
     /**
-     * 分页获取机构
-     *
-     * @param pageRequest 分页请求
-     * @return 机构信息实体类
-     */
-    @GetMapping("/institution/all")
-    @Permission(role = {RolePermissionEnum.ADMIN, RolePermissionEnum.INSTITUTE_MANAGER})
-    public BaseGenericsResponse<List<InstitutionDTO>> getAllInstitution(PageRequest pageRequest) throws Exception {
-        return BaseGenericsResponse.successBaseResp(institutionService.getListPage(pageRequest));
-    }
-
-    /**
-     * 申请入驻
-     *
-     * @param institutionRequest 机构信息请求
-     * @return 审核通过信息
-     */
-    @PostMapping("/institution/apply")
-    public BaseGenericsResponse<String> apply(InstitutionRequest institutionRequest) throws Exception {
-        return institutionService.apply(institutionRequest);
-    }
-
-    /**
      * 导入学生
      *
      * @param baseRequest 基础请求
@@ -144,8 +122,21 @@ public class UserController {
      * @return 学生信息列表
      */
     @GetMapping("/student/all")
-    public BaseGenericsResponse<List<StudentInfoDTO>> getAllStudent(PageRequest pageRequest) {
+    public BaseGenericsResponse<List<StudentInfoDTO>> getAllStudent(PageRequest pageRequest) throws Exception {
         return BaseGenericsResponse.successBaseResp(studentService.getListPage(pageRequest));
+    }
+
+    /**
+     * 获取在校信息
+     *
+     * @param baseRequest 基础请求
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/student/schoolInfo")
+    @Permission(role = RolePermissionEnum.STUDENT)
+    public BaseGenericsResponse<List<CourseInfoDTO>> getSchoolInfo(BaseRequest baseRequest) throws Exception {
+        return studentService.getSchoolInfo(baseRequest);
     }
 
     /**
@@ -157,8 +148,9 @@ public class UserController {
      */
     @PostMapping("/teacher/import")
     @Permission(role = {RolePermissionEnum.ADMIN})
-    public BaseGenericsResponse<String> importTeacher(BaseRequest baseRequest, @RequestParam("file") MultipartFile file) {
-        return null;
+    public BaseGenericsResponse<String> importTeacher(BaseRequest baseRequest, @RequestParam("file") MultipartFile file) throws Exception {
+        teacherService.importTeacher(file);
+        return BaseGenericsResponse.successBaseResp("导入成功");
     }
 
     /**
@@ -169,9 +161,8 @@ public class UserController {
      */
     @PostMapping("/teacher/byRole")
     @Permission(role = {RolePermissionEnum.ADMIN})
-    public BaseGenericsResponse<List<TeacherInfoDTO>> getTeacherInfoListByRole(PageRequest pageRequest) {
-
-        return null;
+    public BaseGenericsResponse<List<TeacherInfoDTO>> getTeacherInfoListByRole(PageRequest pageRequest) throws Exception {
+        return teacherService.getTeacherInfoListByRole(pageRequest);
     }
 
     /**
@@ -182,8 +173,8 @@ public class UserController {
      */
     @PostMapping("/teacher/bySector")
     @Permission(role = {RolePermissionEnum.ADMIN})
-    public BaseGenericsResponse<List<TeacherInfoDTO>> getTeacherInfoListBySectorId(PageRequest pageRequest) {
-        return null;
+    public BaseGenericsResponse<List<TeacherInfoDTO>> getTeacherInfoListBySectorId(PageRequest pageRequest) throws Exception {
+        return teacherService.getTeacherInfoListBySectorId(pageRequest);
     }
 
     /**
@@ -333,6 +324,32 @@ public class UserController {
         userInfoDTO.setRole(RolePermissionEnum.EDUCATIONAL_MANAGER.getKey());
         userService.save(baseConvert.one(userInfoDTO));
         return BaseGenericsResponse.successBaseResp("设置成功");
+    }
+
+    /**
+     * 教务管理员分页搜索全部学生
+     *
+     * @param studentInfoRequest 学生信息请求
+     * @return 学生信息DTO列表
+     */
+    @GetMapping("/acaAdmin/searchStu")
+    @Permission(role = {RolePermissionEnum.ADMIN, RolePermissionEnum.EDUCATIONAL_MANAGER})
+    public BaseGenericsResponse<PageStudentInfoDTO> acaAdminSearchStu(StudentInfoRequest studentInfoRequest) throws Exception {
+        return studentService.searchStuForAcaAdmin(studentInfoRequest);
+    }
+
+    /**
+     * 添加课程记录
+     *
+     * @param baseRequest 基础请求
+     * @param file 文件
+     * @return 是否成功
+     */
+    @PostMapping("/acaAdmin/addCourse")
+    @Permission(role = {RolePermissionEnum.ADMIN, RolePermissionEnum.EDUCATIONAL_MANAGER})
+    public BaseGenericsResponse<String> importCourse(BaseRequest baseRequest, @RequestParam("file") MultipartFile file) {
+        courseInfoService.importCourse(file);
+        return BaseGenericsResponse.successBaseResp("导入成功");
     }
 
     /**

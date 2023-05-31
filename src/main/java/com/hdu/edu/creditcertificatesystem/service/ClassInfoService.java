@@ -36,5 +36,5 @@ public interface ClassInfoService {
      * @param baseRequest 基础请求
      * @return 班级信息DTO列表
      */
-    BaseGenericsResponse<List<ClassInfoDTO>> getAllList(BaseRequest baseRequest);
+    BaseGenericsResponse<List<ClassInfoDTO>> getAllList(BaseRequest baseRequest) throws Exception;
 }

@@ -8,6 +8,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+
+import lombok.Getter;
+import lombok.Setter;
 import org.web3j.abi.EventEncoder;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.Bool;
@@ -324,6 +327,8 @@ public class LessonContract extends Contract {
         return deployRemoteCall(LessonContract.class, web3j, transactionManager, gasPrice, gasLimit, BINARY, "");
     }
 
+    @Getter
+    @Setter
     public static class Lesson extends DynamicStruct {
         public String lessonId;
 
@@ -382,6 +387,8 @@ public class LessonContract extends Contract {
         }
     }
 
+    @Getter
+    @Setter
     public static class ExtraInfo extends DynamicStruct {
         public String lessonId;
 

@@ -1,8 +1,15 @@
 package com.hdu.edu.creditcertificatesystem;
 
-import com.hdu.edu.creditcertificatesystem.contract.UserContract;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hdu.edu.creditcertificatesystem.constant.RedisPrefixConstants;
+import com.hdu.edu.creditcertificatesystem.contract.*;
+import com.hdu.edu.creditcertificatesystem.entity.ClassInfo;
 import com.hdu.edu.creditcertificatesystem.enums.ContractTypeEnum;
+import com.hdu.edu.creditcertificatesystem.mapper.ClassInfoMapper;
+import com.hdu.edu.creditcertificatesystem.pojo.dto.mail.AlarmMail;
 import com.hdu.edu.creditcertificatesystem.property.ContractProperties;
+import com.hdu.edu.creditcertificatesystem.property.MailProperties;
+import com.hdu.edu.creditcertificatesystem.util.EmailUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -16,7 +23,6 @@ import org.web3j.tx.gas.StaticGasProvider;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
-import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -28,6 +34,15 @@ class CreditCertificateSystemApplicationTests {
 
     @Setter(onMethod_ = @Resource(name = "stringRedisTemplate"))
     private ValueOperations<String, String> redisValueOperations;
+
+    @Setter(onMethod_ = @Resource(name = "redisTemplate"))
+    private ValueOperations<String, Integer> redisValueOperationsForLong;
+
+    @Setter(onMethod_ = @Autowired)
+    private ClassInfoMapper classInfoMapper;
+
+    @Setter(onMethod_ = @Autowired)
+    private MailProperties mailProperties;
 
     /**
      * 部署合约
@@ -51,8 +66,21 @@ class CreditCertificateSystemApplicationTests {
 
         // 部署合约
         UserContract userContract = UserContract.deploy(web3j, credentials, provider).send();
+        TeacherContract teacherContract = TeacherContract.deploy(web3j, credentials, provider).send();
+        InstitutionContract institutionContract = InstitutionContract.deploy(web3j, credentials, provider).send();
+        StudentContract studentContract = StudentContract.deploy(web3j, credentials, provider).send();
+        LessonContract lessonContract = LessonContract.deploy(web3j, credentials, provider).send();
+
         // 存储合约地址到redis中
         redisValueOperations.set(ContractTypeEnum.USER.getValue(), userContract.getContractAddress());
+        redisValueOperations.set(ContractTypeEnum.INSTITUTION.getValue(), institutionContract.getContractAddress());
+        redisValueOperations.set(ContractTypeEnum.STUDENT.getValue(), studentContract.getContractAddress());
+        redisValueOperations.set(ContractTypeEnum.TEACHER.getValue(), teacherContract.getContractAddress());
+        redisValueOperations.set(ContractTypeEnum.LESSON.getValue(), lessonContract.getContractAddress());
+
+        // 存储主键Id
+        redisValueOperationsForLong.set(RedisPrefixConstants.ID + ":" + RedisPrefixConstants.INSTITUTION_INFO, 1);
+        redisValueOperationsForLong.set(RedisPrefixConstants.ID + ":" + RedisPrefixConstants.LESSON_INFO, 1);
 
         // 创建初始化管理员账户
         LocalDateTime localDateTime = LocalDateTime.now();
@@ -69,5 +97,32 @@ class CreditCertificateSystemApplicationTests {
             userContract.save(userInfo).send();
         }
         log.info("合约部署成功!");
+    }
+
+    @Test
+    void testEmail() {
+        AlarmMail alarmMail = new AlarmMail();
+        alarmMail.setContent("测试0509hhhh");
+        alarmMail.setReceivers("chenyb46701@hundsun.com");
+        alarmMail.setSubject("标题哈哈哈哈");
+        EmailUtils emailUtils = new EmailUtils(mailProperties, alarmMail);
+        emailUtils.sendMail();
+    }
+
+    @Test
+    void testRedis() {
+        final String prefix = RedisPrefixConstants.ID + ":" + RedisPrefixConstants.INSTITUTION_INFO;
+        final Integer andSet = redisValueOperationsForLong.getAndSet(prefix,
+                redisValueOperationsForLong.get(prefix) + 1);
+        System.out.println(andSet);
+    }
+
+    @Test
+    void testMapper() {
+        System.out.println(classInfoMapper.selectList(new QueryWrapper<>()));
+        ClassInfo classInfo = new ClassInfo();
+        classInfo.setClassName("爱坤");
+        classInfo.setMajorId(1);
+        classInfoMapper.insert(classInfo);
     }
 }

@@ -1,10 +1,7 @@
 package com.hdu.edu.creditcertificatesystem.spring;
 
 import com.hdu.edu.creditcertificatesystem.constant.ErrorCodeConstant;
-import com.hdu.edu.creditcertificatesystem.contract.InstitutionContract;
-import com.hdu.edu.creditcertificatesystem.contract.StudentContract;
-import com.hdu.edu.creditcertificatesystem.contract.TeacherContract;
-import com.hdu.edu.creditcertificatesystem.contract.UserContract;
+import com.hdu.edu.creditcertificatesystem.contract.*;
 import com.hdu.edu.creditcertificatesystem.enums.ContractTypeEnum;
 import com.hdu.edu.creditcertificatesystem.exception.BaseException;
 import com.hdu.edu.creditcertificatesystem.property.ContractProperties;
@@ -106,6 +103,8 @@ public class ContractLoaderAdvice {
                     case STUDENT:
                         contractField.set(serviceTarget, StudentContract.load(address, web3j, credentials, provider));
                         break;
+                    case LESSON:
+                        contractField.set(serviceTarget, LessonContract.load(address, web3j, credentials, provider));
                     default:
                 }
 

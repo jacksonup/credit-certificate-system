@@ -2,20 +2,37 @@ server:
   port: 8090
 
 spring:
+  main:
+    allow-circular-references: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/lease
+    url: jdbc:mysql://127.0.0.1:3306/credit
     username: root
     password: cyb1255210
   redis:
     host: 127.0.0.1
     port: 6379
+mybatis-plus:
+  configuration:
+    database-id: mysql
+    jdbc-type-for-null: 'null'
+  mapperLocations: [ "classpath*:/com/hdu/edu/creditcertificatesystem/mapper/*.xml" ]
 
 # 合约配置
 contract:
   credentials: 4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d
   http-service: HTTP://127.0.0.1:8545
-  gas-price: 2000000
-  gas-limit: 6721975
+  gas-price: 20000
+  gas-limit: 8721975
+
+system:
+  mail:
+    protocol: smtp
+    host: smtp.163.com
+    port: 25
+    account: 17857126043@163.com
+    password: WEWMPSDZHNLQUHTV
+    ssl: false
+    serverType: ms_exchange
 
 

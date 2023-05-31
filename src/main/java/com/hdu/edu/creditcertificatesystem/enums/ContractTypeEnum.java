@@ -31,7 +31,12 @@ public enum ContractTypeEnum {
     /**
      * 学生
      */
-    STUDENT("3", "student");
+    STUDENT("3", "studentContract"),
+
+    /**
+     * 课程
+     */
+    LESSON("4", "lessonContract");
 
     private static final Map<String, ContractTypeEnum> KEY_MAP = new HashMap<>(8);
 

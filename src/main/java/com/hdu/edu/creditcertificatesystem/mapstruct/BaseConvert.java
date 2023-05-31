@@ -19,6 +19,14 @@ public interface BaseConvert<E extends DynamicStruct, R extends BaseRequest, D, 
     E convert(R request);
 
     /**
+     * Request转Entity-extra
+     *
+     * @param request 基础请求
+     * @return Entity
+     */
+    EX convertEx(R request);
+
+    /**
      * Entity转DTO
      *
      * @param entity Entity

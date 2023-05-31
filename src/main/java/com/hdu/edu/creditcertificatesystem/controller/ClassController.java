@@ -63,7 +63,7 @@ public class ClassController {
      */
     @GetMapping("/all")
     @Permission(role = {RolePermissionEnum.ADMIN, RolePermissionEnum.EDUCATIONAL_MANAGER})
-    public BaseGenericsResponse<List<ClassInfoDTO>> getAllList(BaseRequest baseRequest) {
+    public BaseGenericsResponse<List<ClassInfoDTO>> getAllList(BaseRequest baseRequest) throws Exception {
         return classInfoService.getAllList(baseRequest);
     }
 }

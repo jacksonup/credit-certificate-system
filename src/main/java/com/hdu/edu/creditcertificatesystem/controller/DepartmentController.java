@@ -51,7 +51,7 @@ public class DepartmentController {
      */
     @GetMapping("/all")
     @Permission(role = RolePermissionEnum.ADMIN)
-    public BaseGenericsResponse<List<DepartmentInfoDTO>> getAllList(BaseRequest baseRequest) {
+    public BaseGenericsResponse<List<DepartmentInfoDTO>> getAllList(BaseRequest baseRequest) throws Exception {
         return departmentService.getAllList(baseRequest);
     }
 }

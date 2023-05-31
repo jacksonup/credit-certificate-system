@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * 机构信息请求类
@@ -54,12 +55,22 @@ public class InstitutionRequest extends BaseRequest {
     /**
      * 审核状态；0待审核；1已通过；
      */
-    private BigInteger status;
+    private Integer status;
 
     /**
      * 授权证明照片
      */
     private String authorCertificatePic;
+
+    /**
+     * 专业Id列表
+     */
+    private String majorId;
+
+    /**
+     * 学院Id列表
+     */
+    private String facultyId;
 
     /**
      * 创建时间
@@ -80,4 +91,21 @@ public class InstitutionRequest extends BaseRequest {
      * 驳回原因
      */
     private String reason;
+
+    /* 扩展字段 */
+
+    /**
+     * 证明图片URL列表
+     */
+    private List<String> proofPictures;
+
+    /**
+     * 学院id列表
+     */
+    private List<Long> faculties;
+
+    /**
+     * 专业id列表
+     */
+    private List<Long> majors;
 }

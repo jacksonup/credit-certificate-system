@@ -1,7 +1,7 @@
 package com.hdu.edu.creditcertificatesystem.mapstruct.impl;
 
 import com.hdu.edu.creditcertificatesystem.contract.StudentContract;
-import com.hdu.edu.creditcertificatesystem.mapstruct.StudentConvert;
+import com.hdu.edu.creditcertificatesystem.mapstruct.StudentInfoConvert;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.StudentInfoDTO;
 import com.hdu.edu.creditcertificatesystem.pojo.request.StudentInfoRequest;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import java.util.List;
  * @date 2023/5/2
  */
 @Component
-public class StudentConvertImpl implements StudentConvert {
+public class StudentConvertImpl implements StudentInfoConvert {
     @Override
     public StudentContract.StudentInfo convert(StudentInfoRequest request) {
         return new StudentContract.StudentInfo(
@@ -55,5 +55,19 @@ public class StudentConvertImpl implements StudentConvert {
                 new BigInteger(String.valueOf(studentInfoRequest.getBirthday())),
                 new BigInteger(String.valueOf(studentInfoRequest.getEntranceTime()))
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StudentInfoDTO convertEx(StudentContract.StudentInfo studentInfo, StudentContract.ExtraInfo extraInfo) {
+        StudentInfoDTO studentInfoDTO = new StudentInfoDTO();
+        studentInfoDTO.setAccount(studentInfo.getAccount());
+        studentInfoDTO.setName(studentInfo.getName());
+        studentInfoDTO.setSexual(studentInfo.getSexual().intValue() == 0 ? "女" : "男");
+        studentInfoDTO.setNativePlace(studentInfo.getNativePlace());
+        studentInfoDTO.setDepartment(studentInfo.getDepartment());
+        return studentInfoDTO;
     }
 }

@@ -134,6 +134,7 @@ public class UserServiceImpl implements UserService {
                 }
                 if (set.contains(list.get(0))) {
                     log.error("");
+                    continue;
                 }
                 set.add(list.get(0));
 

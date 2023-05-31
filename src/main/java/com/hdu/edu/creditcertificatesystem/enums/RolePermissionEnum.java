@@ -29,14 +29,19 @@ public enum RolePermissionEnum {
     INSTITUTE_MANAGER(2, "institute_manager"),
 
     /**
+     * 机构
+     */
+    INSTITUTE(3, "institute"),
+
+    /**
      * 老师
      */
-    TEACHER(3, "teacher"),
+    TEACHER(4, "teacher"),
 
     /**
      * 学生
      */
-    STUDENT(4, "student");
+    STUDENT(5, "student");
 
     private static final Map<String, ContractTypeEnum> KEY_MAP = new HashMap<>(8);
 
