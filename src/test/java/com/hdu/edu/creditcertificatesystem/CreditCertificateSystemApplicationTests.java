@@ -47,7 +47,7 @@ class CreditCertificateSystemApplicationTests {
     /**
      * 部署合约
      * ganache不关闭，可以不用重新部署；ganache 重启需部署
-     * ganache-cli -d "tackle frozen poet aware struggle ridge february merge pulse doll enhance air"
+     * ganache-cli -d "tackle frozen poet aware struggle ridge february merge pulse doll enhance air" -l 90000000 -e 1000 --allowUnlimitedContractSize
      *
      * @throws Exception 异常
      */
