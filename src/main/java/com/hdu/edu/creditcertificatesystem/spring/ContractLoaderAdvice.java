@@ -82,7 +82,7 @@ public class ContractLoaderAdvice {
                 final String address = redisValueOperations.get(typeEnum.getValue());
                 if (StringUtils.isBlank(address)) {
                     log.error("用户合约未部署!");
-                    throw new BaseException(ErrorCodeConstant.NO_EXIST_CODE, "用户合约未部署!");
+                    throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "用户合约未部署!");
                 }
 
                 // 获取该实例中的 contract 字段

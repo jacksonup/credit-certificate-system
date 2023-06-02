@@ -36,7 +36,7 @@ public class CloudComponentAdvice {
 
                 // 校验token是否有效
                 if (StringUtils.isNotBlank(baseRequest.getToken()) && !JwtUtils.verifyToken(baseRequest.getToken())) {
-                    throw new BaseException(ErrorCodeConstant.PARAM_VALID_CODE, "token失效");
+                    throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "token失效");
                 }
             }
         }

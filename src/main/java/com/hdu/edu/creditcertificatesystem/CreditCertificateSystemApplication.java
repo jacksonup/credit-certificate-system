@@ -21,5 +21,4 @@ public class CreditCertificateSystemApplication {
         SpringApplication.run(CreditCertificateSystemApplication.class, args);
         System.out.println("项目启动成功");
     }
-
 }

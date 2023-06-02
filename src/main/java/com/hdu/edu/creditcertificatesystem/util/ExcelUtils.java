@@ -1,5 +1,7 @@
 package com.hdu.edu.creditcertificatesystem.util;
 
+import com.hdu.edu.creditcertificatesystem.constant.ErrorCodeConstant;
+import com.hdu.edu.creditcertificatesystem.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -108,7 +110,9 @@ public class ExcelUtils {
                 totalList.add(map);
             }
         } catch (IOException e) {
+            log.error("解析Excel异常");
             e.printStackTrace();
+            throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "解析Excel异常");
         } finally {
             try {
                 if (workbook != null) {
