@@ -6,7 +6,9 @@ import com.hdu.edu.creditcertificatesystem.contract.*;
 import com.hdu.edu.creditcertificatesystem.entity.ClassInfo;
 import com.hdu.edu.creditcertificatesystem.enums.ContractTypeEnum;
 import com.hdu.edu.creditcertificatesystem.mapper.ClassInfoMapper;
+import com.hdu.edu.creditcertificatesystem.mapstruct.StudentInfoConvert;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.mail.AlarmMail;
+import com.hdu.edu.creditcertificatesystem.pojo.request.StudentInfoRequest;
 import com.hdu.edu.creditcertificatesystem.property.ContractProperties;
 import com.hdu.edu.creditcertificatesystem.property.MailProperties;
 import com.hdu.edu.creditcertificatesystem.util.EmailUtils;
@@ -19,12 +21,15 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tuples.generated.Tuple2;
 import org.web3j.tx.gas.StaticGasProvider;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @SpringBootTest
 @Slf4j
@@ -43,6 +48,9 @@ class CreditCertificateSystemApplicationTests {
 
     @Setter(onMethod_ = @Autowired)
     private MailProperties mailProperties;
+
+    @Setter(onMethod_ = @Autowired)
+    private StudentInfoConvert studentInfoConvert;
 
     /**
      * 部署合约
@@ -71,6 +79,8 @@ class CreditCertificateSystemApplicationTests {
         StudentContract studentContract = StudentContract.deploy(web3j, credentials, provider).send();
         LessonContract lessonContract = LessonContract.deploy(web3j, credentials, provider).send();
 
+        log.info(studentContract.getContractAddress());
+
         // 存储合约地址到redis中
         redisValueOperations.set(ContractTypeEnum.USER.getValue(), userContract.getContractAddress());
         redisValueOperations.set(ContractTypeEnum.INSTITUTION.getValue(), institutionContract.getContractAddress());
@@ -91,8 +101,8 @@ class CreditCertificateSystemApplicationTests {
                    "admin" + i,
                     new BigInteger("0"),
                     new BigInteger(localDateTime.format(formatter)),
-                    "",
-                    ""
+                    "10086",
+                    "jacksonyan999@163.com"
             );
             userContract.save(userInfo).send();
         }
@@ -124,5 +134,37 @@ class CreditCertificateSystemApplicationTests {
         classInfo.setClassName("爱坤");
         classInfo.setMajorId(1);
         classInfoMapper.insert(classInfo);
+    }
+
+    @Test
+    void testContract() throws Exception {
+        Web3j web3j = Web3j.build(new HttpService(contractProperties.getHttpService()));
+
+        // 生成资格凭证
+        Credentials credentials = Credentials.create(contractProperties.getCredentials());
+
+        final String s = redisValueOperations.get(ContractTypeEnum.STUDENT.getValue());
+
+        StaticGasProvider provider = new StaticGasProvider(
+                contractProperties.getGasPrice(),
+                contractProperties.getGasLimit());
+        StudentContract studentContract = StudentContract.load(s, web3j, credentials, provider);
+
+        final Tuple2<List<StudentContract.StudentInfo>, List<StudentContract.ExtraInfo>> send = studentContract.getAll().send();
+        StudentInfoRequest studentInfoRequest = new StudentInfoRequest();
+        studentInfoRequest.setAccount("1905240");
+        final Tuple2<StudentContract.StudentInfo, StudentContract.ExtraInfo> send1 = studentContract.getEntity(
+                studentInfoConvert.convert(studentInfoRequest)
+        ).send();
+
+        System.out.println(1);
+    }
+
+    @Test
+    void testTime() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        int time = 20231005;
+        LocalDate createTime = LocalDate.parse(String.valueOf(time), formatter);
+        System.out.println(createTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
     }
 }

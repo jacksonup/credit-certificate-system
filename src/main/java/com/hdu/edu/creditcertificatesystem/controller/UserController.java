@@ -17,6 +17,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -159,7 +161,7 @@ public class UserController {
      * @param pageRequest 分页请求
      * @return 教师信息列表
      */
-    @PostMapping("/teacher/byRole")
+    @GetMapping("/teacher/byRole")
     @Permission(role = {RolePermissionEnum.ADMIN})
     public BaseGenericsResponse<List<TeacherInfoDTO>> getTeacherInfoListByRole(PageRequest pageRequest) throws Exception {
         return teacherService.getTeacherInfoListByRole(pageRequest);
@@ -171,7 +173,7 @@ public class UserController {
      * @param pageRequest 分页请求
      * @return 教师信息列表
      */
-    @PostMapping("/teacher/bySector")
+    @GetMapping("/teacher/bySector")
     @Permission(role = {RolePermissionEnum.ADMIN})
     public BaseGenericsResponse<List<TeacherInfoDTO>> getTeacherInfoListBySectorId(PageRequest pageRequest) throws Exception {
         return teacherService.getTeacherInfoListBySectorId(pageRequest);
@@ -303,6 +305,12 @@ public class UserController {
             return BaseGenericsResponse.failureBaseResp(ErrorCodeConstant.CUSTOM_CODE, "用户信息必须为教务管理员角色");
         }
         userInfoDTO.setRole(RolePermissionEnum.TEACHER.getKey());
+
+        // 格式化时间
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(userInfoDTO.getCreateTime(), formatter);
+        userInfoDTO.setCreateTime(dateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+
         userService.save(baseConvert.one(userInfoDTO));
         return BaseGenericsResponse.successBaseResp("取消成功");
     }
@@ -322,6 +330,12 @@ public class UserController {
             return BaseGenericsResponse.failureBaseResp(ErrorCodeConstant.CUSTOM_CODE, "用户信息必须为普通教师角色");
         }
         userInfoDTO.setRole(RolePermissionEnum.EDUCATIONAL_MANAGER.getKey());
+
+        // 格式化时间
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(userInfoDTO.getCreateTime(), formatter);
+        userInfoDTO.setCreateTime(dateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+
         userService.save(baseConvert.one(userInfoDTO));
         return BaseGenericsResponse.successBaseResp("设置成功");
     }

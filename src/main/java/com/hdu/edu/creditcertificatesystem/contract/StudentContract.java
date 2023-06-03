@@ -366,6 +366,7 @@ public class StudentContract extends Contract {
     }
 
     @Getter
+    @Setter
     public static class StudentInfo extends DynamicStruct {
         public String account;
 
@@ -408,6 +409,8 @@ public class StudentContract extends Contract {
         }
     }
 
+    @Getter
+    @Setter
     public static class ExtraInfo extends DynamicStruct {
         public String account;
 

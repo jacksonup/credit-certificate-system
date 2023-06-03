@@ -29,8 +29,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.web3j.tx.exceptions.ContractCallException;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -101,18 +104,23 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<UserInfoDTO> getListPage(PageRequest pageRequest) throws Exception {
-        final List<UserContract.UserInfo> list = userContract.getListPage(
-                new BigInteger(String.valueOf(pageRequest.getFrom())),
-                new BigInteger("10")).send();
-        if (CollectionUtils.isEmpty(list)) {
-            log.error("无数据");
-            throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "无数据");
+        try {
+            final List<UserContract.UserInfo> list = userContract.getListPage(
+                    new BigInteger(String.valueOf(pageRequest.getFrom())),
+                    new BigInteger("10")).send();
+            if (CollectionUtils.isEmpty(list)) {
+                log.error("无数据");
+                throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "无数据");
+            }
+            List<UserInfoDTO> result = new ArrayList<>();
+            for (UserContract.UserInfo userInfo : list) {
+                result.add(baseConvert.convert(userInfo));
+            }
+            return result;
+        } catch (ContractCallException e) {
+            log.error("数据为空");
+            return null;
         }
-        List<UserInfoDTO> result = new ArrayList<>();
-        for (UserContract.UserInfo userInfo : list) {
-            result.add(baseConvert.convert(userInfo));
-        }
-        return result;
     }
 
     /**
@@ -197,12 +205,15 @@ public class UserServiceImpl implements UserService {
                 userInfoRequest.setRole(RolePermissionEnum.STUDENT.getKey());
                 userInfoRequest.setPhone(list.get(3));
                 userInfoRequest.setEmail(list.get(4));
+                userInfoRequest.setCreateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
 
                 // 生成学生信息
                 StudentInfoRequest studentInfoRequest = new StudentInfoRequest();
                 studentInfoRequest.setAccount(list.get(0));
                 studentInfoRequest.setName(list.get(1));
-                studentInfoRequest.setSexual(Integer.valueOf(list.get(2)));
+
+                // 判断性别
+                studentInfoRequest.setSexual(list.get(2).equals("男") ? 1 : 0);
                 studentInfoRequest.setNativePlace(list.get(15));
                 studentInfoRequest.setDepartment(list.get(8));
                 studentInfoRequest.setMajor(list.get(9));

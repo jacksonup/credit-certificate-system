@@ -11,6 +11,7 @@ import com.hdu.edu.creditcertificatesystem.exception.BaseException;
 import com.hdu.edu.creditcertificatesystem.mapper.DepartmentInfoMapper;
 import com.hdu.edu.creditcertificatesystem.mapstruct.TeacherInfoConvert;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.TeacherInfoDTO;
+import com.hdu.edu.creditcertificatesystem.pojo.dto.UserInfoDTO;
 import com.hdu.edu.creditcertificatesystem.pojo.request.PageRequest;
 import com.hdu.edu.creditcertificatesystem.pojo.request.TeacherInfoRequest;
 import com.hdu.edu.creditcertificatesystem.pojo.request.UserInfoRequest;
@@ -25,8 +26,11 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.web3j.tx.exceptions.ContractCallException;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -67,12 +71,14 @@ public class TeacherServiceImpl implements TeacherService {
     public void importTeacher(MultipartFile file) throws Exception {
         log.info("正在导入学生用户信息...");
         final List<Map<Integer, List<String>>> infoList = ExcelUtils.readExcel(file);
+        List<TeacherInfoRequest> teacherInfoRequests = new ArrayList<>();
+        List<UserInfoRequest> userInfoRequests = new ArrayList<>();
         HashSet<String> set = new HashSet<>();
         for (Map<Integer, List<String>> map : infoList) {
             for (Integer i : map.keySet()) {
                 // 获取列的信息
                 List<String> list = map.get(i);
-                if (list.size() != 12) {
+                if (list.size() != 13) {
                     log.error("请输入内容，单元格不允许为空");
                     throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "请输入内容，单元格不允许为空");
                 }
@@ -98,23 +104,32 @@ public class TeacherServiceImpl implements TeacherService {
                 userInfoRequest.setRole(RolePermissionEnum.TEACHER.getKey());
                 userInfoRequest.setPhone(list.get(3));
                 userInfoRequest.setEmail(list.get(4));
-                userService.save(userInfoRequest);
+                userInfoRequest.setCreateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+                userInfoRequests.add(userInfoRequest);
 
                 // 生成教师信息
                 TeacherInfoRequest teacherInfoRequest = new TeacherInfoRequest();
                 teacherInfoRequest.setAccount(list.get(0));
                 teacherInfoRequest.setName(list.get(1));
-                teacherInfoRequest.setSexual(Integer.valueOf(list.get(2)));
+                teacherInfoRequest.setSexual(list.get(2).equals("男") ? 1 : 0);
                 teacherInfoRequest.setBirthday(list.get(5));
                 teacherInfoRequest.setIDPhoto(list.get(6));
                 teacherInfoRequest.setDuration(list.get(7));
                 teacherInfoRequest.setDuty(list.get(8));
                 teacherInfoRequest.setPoliticalOutlook(list.get(9));
                 teacherInfoRequest.setPosition(list.get(10));
-                teacherInfoRequest.setDuration(list.get(11));
-
-                save(teacherInfoRequest);
+                teacherInfoRequest.setDepartment(list.get(11));
+                teacherInfoRequest.setEducationalBg(list.get(12));
+                teacherInfoRequests.add(teacherInfoRequest);
             }
+        }
+
+        for (UserInfoRequest userInfoRequest : userInfoRequests) {
+            userService.save(userInfoRequest);
+        }
+
+        for (TeacherInfoRequest teacherInfoRequest : teacherInfoRequests) {
+            save(teacherInfoRequest);
         }
     }
 
@@ -123,25 +138,38 @@ public class TeacherServiceImpl implements TeacherService {
      */
     @Override
     public BaseGenericsResponse<List<TeacherInfoDTO>> getTeacherInfoListByRole(PageRequest pageRequest) throws Exception {
-        // 判断角色Id是否正确
-        if (!Objects.equals(pageRequest.getRole(), RolePermissionEnum.EDUCATIONAL_MANAGER.getKey()) &&
-                !Objects.equals(pageRequest.getRole(), RolePermissionEnum.INSTITUTE_MANAGER.getKey()) &&
-                !Objects.equals(pageRequest.getRole(), RolePermissionEnum.TEACHER.getKey())) {
-            log.error("获取的教师角色只可能是1、2、4");
-            throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "获取的教师角色只可能是1、2、4");
-        }
+        try {
+            // 判断角色Id是否正确
+            if (!Objects.equals(pageRequest.getRole(), RolePermissionEnum.EDUCATIONAL_MANAGER.getKey()) &&
+                    !Objects.equals(pageRequest.getRole(), RolePermissionEnum.INSTITUTE_MANAGER.getKey()) &&
+                    !Objects.equals(pageRequest.getRole(), RolePermissionEnum.TEACHER.getKey())) {
+                log.error("获取的教师角色只可能是1、2、4");
+                throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "获取的教师角色只可能是1、2、4");
+            }
 
-        final List<TeacherContract.TeacherInfo> teacherInfos = teacherContract.getListPageByRole(
-                new BigInteger(String.valueOf(pageRequest.getRole())),
-                new BigInteger(String.valueOf(pageRequest.getFrom())),
-                new BigInteger(String.valueOf(pageRequest.getFrom() + 10)),
-                userContract.getContractAddress()).send();
+            final List<TeacherContract.TeacherInfo> teacherInfos = teacherContract.getListPageByRole(
+                    new BigInteger(String.valueOf(pageRequest.getRole())),
+                    new BigInteger(String.valueOf(pageRequest.getFrom())),
+                    new BigInteger(String.valueOf(pageRequest.getFrom() + 10)),
+                    userContract.getContractAddress()).send();
 
-        List<TeacherInfoDTO> teacherInfoDTOS = new ArrayList<>();
-        for (TeacherContract.TeacherInfo teacherInfo : teacherInfos) {
-            teacherInfoDTOS.add(baseConvert.convert(teacherInfo));
+            List<TeacherInfoDTO> teacherInfoDTOS = new ArrayList<>();
+            for (TeacherContract.TeacherInfo teacherInfo : teacherInfos) {
+                TeacherInfoDTO teacherInfoDTO = baseConvert.convert(teacherInfo);
+
+                // 查询手机号和邮箱
+                UserInfoRequest userInfoRequest = new UserInfoRequest();
+                userInfoRequest.setAccount(teacherInfo.getAccount());
+                final UserInfoDTO userInfoDTO = userService.getDTO(userInfoRequest);
+                teacherInfoDTO.setPhone(userInfoDTO.getPhone());
+                teacherInfoDTO.setEmail(userInfoDTO.getEmail());
+                teacherInfoDTOS.add(teacherInfoDTO);
+            }
+            return BaseGenericsResponse.successBaseResp(teacherInfoDTOS);
+        } catch (ContractCallException e) {
+            log.error("数据为空");
+            return BaseGenericsResponse.successBaseResp(null);
         }
-        return BaseGenericsResponse.successBaseResp(teacherInfoDTOS);
     }
 
     /**
@@ -149,21 +177,34 @@ public class TeacherServiceImpl implements TeacherService {
      */
     @Override
     public BaseGenericsResponse<List<TeacherInfoDTO>> getTeacherInfoListBySectorId(PageRequest pageRequest) throws Exception {
-        final DepartmentInfo departmentInfo = departmentInfoMapper.selectById(pageRequest.getSectorId());
-        if (ObjectUtils.isEmpty(departmentInfo)) {
-            log.error("部门不存在");
-            throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "部门不存在");
-        }
+        try {
+            final DepartmentInfo departmentInfo = departmentInfoMapper.selectById(pageRequest.getSectorId());
+            if (ObjectUtils.isEmpty(departmentInfo)) {
+                log.error("部门不存在");
+                throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "部门不存在");
+            }
 
-        final List<TeacherContract.TeacherInfo> teacherInfos = teacherContract.getListPageBySector(
-                departmentInfo.getDepartmentName(),
-                new BigInteger(String.valueOf(pageRequest.getFrom())),
-                new BigInteger(String.valueOf(pageRequest.getFrom() + 10))).send();
+            final List<TeacherContract.TeacherInfo> teacherInfos = teacherContract.getListPageBySector(
+                    departmentInfo.getDepartmentName(),
+                    new BigInteger(String.valueOf(pageRequest.getFrom())),
+                    new BigInteger(String.valueOf(pageRequest.getFrom() + 10))).send();
 
-        List<TeacherInfoDTO> teacherInfoDTOS = new ArrayList<>();
-        for (TeacherContract.TeacherInfo teacherInfo : teacherInfos) {
-            teacherInfoDTOS.add(baseConvert.convert(teacherInfo));
+            List<TeacherInfoDTO> teacherInfoDTOS = new ArrayList<>();
+            for (TeacherContract.TeacherInfo teacherInfo : teacherInfos) {
+                TeacherInfoDTO teacherInfoDTO = baseConvert.convert(teacherInfo);
+
+                // 查询手机号和邮箱
+                UserInfoRequest userInfoRequest = new UserInfoRequest();
+                userInfoRequest.setAccount(teacherInfo.getAccount());
+                final UserInfoDTO userInfoDTO = userService.getDTO(userInfoRequest);
+                teacherInfoDTO.setPhone(userInfoDTO.getPhone());
+                teacherInfoDTO.setEmail(userInfoDTO.getEmail());
+                teacherInfoDTOS.add(teacherInfoDTO);
+            }
+            return BaseGenericsResponse.successBaseResp(teacherInfoDTOS);
+        } catch (ContractCallException e) {
+            log.error("数据为空");
+            return BaseGenericsResponse.successBaseResp(null);
         }
-        return BaseGenericsResponse.successBaseResp(teacherInfoDTOS);
     }
 }

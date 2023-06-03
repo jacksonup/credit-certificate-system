@@ -27,7 +27,7 @@ public interface StudentService {
      *
      * @param studentInfoRequest 学生请求
      */
-    void save(StudentInfoRequest studentInfoRequest);
+    void save(StudentInfoRequest studentInfoRequest) throws Exception;
 
     /**
      * 教务管理员分页搜索全部学生

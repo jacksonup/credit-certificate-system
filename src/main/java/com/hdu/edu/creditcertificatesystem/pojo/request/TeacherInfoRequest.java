@@ -65,4 +65,9 @@ public class TeacherInfoRequest extends BaseRequest {
      * 证件照路径
      */
     private String IDPhoto;
+
+    /**
+     * 学历
+     */
+    private String educationalBg;
 }

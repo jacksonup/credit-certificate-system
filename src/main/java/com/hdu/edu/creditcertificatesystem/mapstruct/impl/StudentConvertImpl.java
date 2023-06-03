@@ -7,6 +7,8 @@ import com.hdu.edu.creditcertificatesystem.pojo.request.StudentInfoRequest;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -68,6 +70,21 @@ public class StudentConvertImpl implements StudentInfoConvert {
         studentInfoDTO.setSexual(studentInfo.getSexual().intValue() == 0 ? "女" : "男");
         studentInfoDTO.setNativePlace(studentInfo.getNativePlace());
         studentInfoDTO.setDepartment(studentInfo.getDepartment());
+        studentInfoDTO.setMajor(studentInfo.getMajor());
+        studentInfoDTO.setGrade(studentInfo.getGrade());
+        studentInfoDTO.setEducationBg(studentInfo.getEducationBg());
+        studentInfoDTO.setBirthPlace(studentInfo.getNativePlace());
+        studentInfoDTO.setPosition(extraInfo.getPosition());
+        studentInfoDTO.setNativePlace(studentInfo.getNativePlace());
+        studentInfoDTO.setPoliticalOutlook(extraInfo.getPoliticalOutlook());
+
+        // 解析时间
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        LocalDate localDate = LocalDate.parse(String.valueOf(extraInfo.getBirthday()), formatter);
+        studentInfoDTO.setBirthday(localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+
+        localDate = LocalDate.parse(String.valueOf(extraInfo.getEntranceTime()), formatter);
+        studentInfoDTO.setEntranceTime(localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         return studentInfoDTO;
     }
 }

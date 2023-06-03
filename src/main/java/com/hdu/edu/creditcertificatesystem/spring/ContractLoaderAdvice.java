@@ -39,8 +39,6 @@ public class ContractLoaderAdvice {
     @Setter(onMethod_ = @Resource(name = "stringRedisTemplate"))
     private ValueOperations<String, String> redisValueOperations;
 
-    private UserContract userContract;
-
     /**
      * 定义一个使用了ContractLoader注解的切点
      */

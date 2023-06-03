@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.hdu.edu.creditcertificatesystem.constant.ErrorCodeConstant;
 import com.hdu.edu.creditcertificatesystem.contract.InstitutionContract;
 import com.hdu.edu.creditcertificatesystem.contract.StudentContract;
+import com.hdu.edu.creditcertificatesystem.contract.UserContract;
 import com.hdu.edu.creditcertificatesystem.entity.FacultyInfo;
 import com.hdu.edu.creditcertificatesystem.entity.MajorInfo;
 import com.hdu.edu.creditcertificatesystem.enums.ContractTypeEnum;
@@ -12,14 +13,12 @@ import com.hdu.edu.creditcertificatesystem.mapper.FacultyInfoMapper;
 import com.hdu.edu.creditcertificatesystem.mapper.MajorInfoMapper;
 import com.hdu.edu.creditcertificatesystem.mapstruct.StudentInfoConvert;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.*;
-import com.hdu.edu.creditcertificatesystem.pojo.request.BaseRequest;
-import com.hdu.edu.creditcertificatesystem.pojo.request.InstitutionRequest;
-import com.hdu.edu.creditcertificatesystem.pojo.request.PageRequest;
-import com.hdu.edu.creditcertificatesystem.pojo.request.StudentInfoRequest;
+import com.hdu.edu.creditcertificatesystem.pojo.request.*;
 import com.hdu.edu.creditcertificatesystem.pojo.response.BaseGenericsResponse;
 import com.hdu.edu.creditcertificatesystem.service.CourseInfoService;
 import com.hdu.edu.creditcertificatesystem.service.InstitutionService;
 import com.hdu.edu.creditcertificatesystem.service.StudentService;
+import com.hdu.edu.creditcertificatesystem.service.UserService;
 import com.hdu.edu.creditcertificatesystem.spring.ContractLoader;
 import com.hdu.edu.creditcertificatesystem.util.JwtUtils;
 import lombok.Setter;
@@ -49,6 +48,9 @@ public class StudentServiceImpl implements StudentService {
     private StudentInfoConvert baseConvert;
 
     @Setter(onMethod_ = @Autowired)
+    private UserService userService;
+
+    @Setter(onMethod_ = @Autowired)
     private CourseInfoService courseInfoService;
 
     @Setter(onMethod_ = @Autowired)
@@ -74,7 +76,7 @@ public class StudentServiceImpl implements StudentService {
 
         final Tuple2<List<StudentContract.StudentInfo>, List<StudentContract.ExtraInfo>> listTuple2 = studentContract.getListPage(
                 new BigInteger(String.valueOf(pageRequest.getFrom())),
-                new BigInteger("10")).send();
+                new BigInteger(String.valueOf(pageRequest.getFrom() + 10))).send();
 
         List<StudentInfoDTO> result = new ArrayList<>();
         List<StudentContract.StudentInfo> studentInfoList;
@@ -91,7 +93,15 @@ public class StudentServiceImpl implements StudentService {
 
                 // entity转化为dto
                 for (int i = 0; i < studentInfoList.size(); i++) {
-                    result.add(baseConvert.convertEx(studentInfoList.get(i), extraInfoList.get(i)));
+                    StudentInfoDTO studentInfoDTO = baseConvert.convertEx(studentInfoList.get(i), extraInfoList.get(i));
+
+                    // 查询学生手机号和邮箱
+                    UserInfoRequest userInfoRequest = new UserInfoRequest();
+                    userInfoRequest.setAccount(studentInfoDTO.getAccount());
+                    final UserInfoDTO userInfoDTO = userService.getDTO(userInfoRequest);
+                    studentInfoDTO.setPhone(userInfoDTO.getPhone());
+                    studentInfoDTO.setEmail(userInfoDTO.getEmail());
+                    result.add(studentInfoDTO);
                 }
             }
         }
@@ -103,10 +113,10 @@ public class StudentServiceImpl implements StudentService {
      * {@inheritDoc}
      */
     @Override
-    public void save(StudentInfoRequest studentInfoRequest) {
+    public void save(StudentInfoRequest studentInfoRequest) throws Exception {
         studentContract.save(
                 baseConvert.convert(studentInfoRequest),
-                baseConvert.convertEx(studentInfoRequest));
+                baseConvert.convertEx(studentInfoRequest)).send();
     }
 
     /**
