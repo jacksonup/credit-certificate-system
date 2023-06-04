@@ -76,7 +76,7 @@ public class StudentServiceImpl implements StudentService {
 
         final Tuple2<List<StudentContract.StudentInfo>, List<StudentContract.ExtraInfo>> listTuple2 = studentContract.getListPage(
                 new BigInteger(String.valueOf(pageRequest.getFrom())),
-                new BigInteger(String.valueOf(pageRequest.getFrom() + 10))).send();
+                new BigInteger(String.valueOf(pageRequest.getFrom() + 9))).send();
 
         List<StudentInfoDTO> result = new ArrayList<>();
         List<StudentContract.StudentInfo> studentInfoList;

@@ -150,7 +150,7 @@ public class TeacherServiceImpl implements TeacherService {
             final List<TeacherContract.TeacherInfo> teacherInfos = teacherContract.getListPageByRole(
                     new BigInteger(String.valueOf(pageRequest.getRole())),
                     new BigInteger(String.valueOf(pageRequest.getFrom())),
-                    new BigInteger(String.valueOf(pageRequest.getFrom() + 10)),
+                    new BigInteger(String.valueOf(pageRequest.getFrom() + 9)),
                     userContract.getContractAddress()).send();
 
             List<TeacherInfoDTO> teacherInfoDTOS = new ArrayList<>();
@@ -187,7 +187,7 @@ public class TeacherServiceImpl implements TeacherService {
             final List<TeacherContract.TeacherInfo> teacherInfos = teacherContract.getListPageBySector(
                     departmentInfo.getDepartmentName(),
                     new BigInteger(String.valueOf(pageRequest.getFrom())),
-                    new BigInteger(String.valueOf(pageRequest.getFrom() + 10))).send();
+                    new BigInteger(String.valueOf(pageRequest.getFrom() + 9))).send();
 
             List<TeacherInfoDTO> teacherInfoDTOS = new ArrayList<>();
             for (TeacherContract.TeacherInfo teacherInfo : teacherInfos) {

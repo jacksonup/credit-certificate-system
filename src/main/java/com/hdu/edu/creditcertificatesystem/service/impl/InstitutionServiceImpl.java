@@ -29,6 +29,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.web3j.tuples.generated.Tuple2;
+import org.web3j.tx.exceptions.ContractCallException;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
@@ -75,7 +76,7 @@ public class InstitutionServiceImpl implements InstitutionService {
         }
         final InstitutionContract.InstitutionInfo institutionInfo = result.getValue1();
         final InstitutionContract.ExtraInfo extraInfo = result.getValue2();
-        if (ObjectUtils.isEmpty(institutionInfo) || ObjectUtils.isEmpty(extraInfo)) {
+        if (StringUtils.isEmpty(institutionInfo.getId()) || StringUtils.isEmpty(extraInfo.getId())) {
             log.error("机构信息不存在");
             throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "机构信息不存在");
         }
@@ -91,7 +92,7 @@ public class InstitutionServiceImpl implements InstitutionService {
         final Tuple2<List<InstitutionContract.InstitutionInfo>, List<InstitutionContract.ExtraInfo>> listListTuple2 =
                 institutionContract.getListPage(
                         new BigInteger(String.valueOf(pageRequest.getFrom())),
-                        new BigInteger("10")).send();
+                        new BigInteger(String.valueOf(pageRequest.getFrom()) + 9)).send();
         if (null == listListTuple2) {
             throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "分页查询机构信息异常");
         }
@@ -116,14 +117,14 @@ public class InstitutionServiceImpl implements InstitutionService {
     @Override
     public BaseGenericsResponse<String> apply(InstitutionRequest institutionRequest) throws Exception {
         final Tuple2<InstitutionContract.InstitutionInfo, InstitutionContract.ExtraInfo> result =
-                institutionContract.getEntity(baseConvert.convert(institutionRequest)).send();
+                institutionContract.getByName(institutionRequest.getInstitutionName()).send();
         final InstitutionContract.InstitutionInfo institutionInfo = result.getValue1();
         final InstitutionContract.ExtraInfo extraInfo = result.getValue2();
 
-        if (ObjectUtils.isEmpty(institutionInfo) || ObjectUtils.isEmpty(extraInfo)) {
+        if (StringUtils.isBlank(institutionInfo.getId()) || StringUtils.isBlank(extraInfo.getId())) {
             // 获取主键Id
             final String prefix = RedisPrefixConstants.ID + ":" + RedisPrefixConstants.INSTITUTION_INFO;
-            institutionInfo.setId(String.valueOf(redisValueOperations.getAndSet(prefix,
+            institutionRequest.setId(String.valueOf(redisValueOperations.getAndSet(prefix,
                     redisValueOperations.get(prefix) + 1)));
 
             // 设置证明照片url
@@ -174,7 +175,8 @@ public class InstitutionServiceImpl implements InstitutionService {
             institutionRequest.setCreateTime((LocalDateTime.now().format(
                     DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))));
 
-            institutionContract.save(baseConvert.convert(institutionRequest), baseConvert.convertEx(institutionRequest));
+            institutionContract.save(baseConvert.convert(institutionRequest), baseConvert.convertEx(institutionRequest)).send();
+            log.info("机构申请成功");
             return BaseGenericsResponse.successBaseResp("申请发起成功，请耐心等待审核，审核通过后将发放账号至邮箱");
         } else {
             if (extraInfo.getStatus().intValue() == AuditTypeEnum.ACCESS.getKey()) {
@@ -211,14 +213,17 @@ public class InstitutionServiceImpl implements InstitutionService {
      */
     @Override
     public List<InstitutionDTO> getListPageByStatus(PageRequest pageRequest) throws Exception {
-        final Tuple2<List<InstitutionContract.InstitutionInfo>, List<InstitutionContract.ExtraInfo>> listTuple2 = institutionContract.getListPageByStatus(
-                new BigInteger(String.valueOf(pageRequest.getStatus())),
-                new BigInteger(String.valueOf(pageRequest.getFrom())),
-                new BigInteger("10")).send();
-
-        if (null == listTuple2) {
-            throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "根据审核状态分页查询机构信息异常");
+        Tuple2<List<InstitutionContract.InstitutionInfo>, List<InstitutionContract.ExtraInfo>> listTuple2;
+        try {
+            listTuple2 = institutionContract.getListPageByStatus(
+                    new BigInteger(String.valueOf(pageRequest.getStatus())),
+                    new BigInteger(String.valueOf(pageRequest.getFrom())),
+                    new BigInteger("10")).send();
+        } catch (ContractCallException e) {
+            log.error("数据为空");
+            throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "数据为空");
         }
+
         final List<InstitutionContract.InstitutionInfo> institutionInfoList = listTuple2.getValue1();
         final List<InstitutionContract.ExtraInfo> extraInfoList = listTuple2.getValue2();
         if (CollectionUtils.isEmpty(institutionInfoList) || CollectionUtils.isEmpty(extraInfoList)) {
