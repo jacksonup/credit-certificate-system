@@ -142,6 +142,7 @@ public class ClassInfoServiceImpl implements ClassInfoService {
             for (ClassInfo classInfo : classInfos) {
                 final String className = classInfo.getClassName();
                 ClassInfoDTO classInfoDTO = new ClassInfoDTO();
+                classInfoDTO.setId(classInfo.getId());
                 classInfoDTO.setClassName(className);
                 classInfoDTO.setCount(map.getOrDefault(className, 0));
 
