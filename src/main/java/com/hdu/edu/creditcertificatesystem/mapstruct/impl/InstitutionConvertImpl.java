@@ -115,8 +115,13 @@ public class InstitutionConvertImpl implements InstitutionConvert {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         LocalDateTime createTime = LocalDateTime.parse(extraInfo.getCreateTime().toString(), formatter);
         institutionDTO.setCreateTime(createTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        LocalDateTime auditTime = LocalDateTime.parse(extraInfo.getCreateTime().toString(), formatter);
-        institutionDTO.setAuditTime(auditTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+        if (StringUtils.isNotBlank(extraInfo.getAuditTime().toString()) && !extraInfo.getAuditTime().toString().equals("999")) {
+            LocalDateTime auditTime = LocalDateTime.parse(extraInfo.getAuditTime().toString(), formatter);
+            institutionDTO.setAuditTime(auditTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        } else {
+            institutionDTO.setAuditTime("");
+        }
 
         institutionDTO.setMessage(extraInfo.getMessage());
         institutionDTO.setReason(extraInfo.getReason());

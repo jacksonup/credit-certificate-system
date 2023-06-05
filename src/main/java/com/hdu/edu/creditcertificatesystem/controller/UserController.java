@@ -1,6 +1,7 @@
 package com.hdu.edu.creditcertificatesystem.controller;
 
 import com.hdu.edu.creditcertificatesystem.constant.ErrorCodeConstant;
+import com.hdu.edu.creditcertificatesystem.enums.AuditTypeEnum;
 import com.hdu.edu.creditcertificatesystem.enums.RolePermissionEnum;
 import com.hdu.edu.creditcertificatesystem.mapstruct.UserInfoConvert;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.*;
@@ -188,7 +189,15 @@ public class UserController {
     @GetMapping("/auditor/audited")
     @Permission(role = RolePermissionEnum.INSTITUTE_MANAGER)
     public BaseGenericsResponse<InstitutionDTO> getAuditedById(InstitutionRequest institutionRequest) throws Exception {
-        return BaseGenericsResponse.successBaseResp(institutionService.getDTO(institutionRequest));
+        final InstitutionDTO dto = institutionService.getDTO(institutionRequest);
+        if (Objects.equals(dto.getStatus(), AuditTypeEnum.ACCESS.getKey())) {
+            log.info("需获取已审核详情，id:{}审批信息，状态为已通过", dto.getId());
+            return BaseGenericsResponse.successBaseResp(dto);
+        } else {
+            log.error("需获取已审核详情，id:{}审批信息，状态为未审核", dto.getId());
+            return BaseGenericsResponse.failureBaseResp(ErrorCodeConstant.CUSTOM_CODE,
+                    String.format("获取已审核详情，id:[%s]审批信息，状态为未审核", dto.getId()));
+        }
     }
 
     /**
@@ -200,7 +209,15 @@ public class UserController {
     @GetMapping("/auditor/auditing")
     @Permission(role = RolePermissionEnum.INSTITUTE_MANAGER)
     public BaseGenericsResponse<InstitutionDTO> getAuditingById(InstitutionRequest institutionRequest) throws Exception {
-        return BaseGenericsResponse.successBaseResp(institutionService.getDTO(institutionRequest));
+        final InstitutionDTO dto = institutionService.getDTO(institutionRequest);
+        if (Objects.equals(dto.getStatus(), AuditTypeEnum.ACCESS.getKey())) {
+            log.error("需获取待审核详情，id:{}审批信息，状态为已通过", dto.getId());
+            return BaseGenericsResponse.failureBaseResp(ErrorCodeConstant.CUSTOM_CODE,
+                    String.format("获取已审核详情，id:[%s]审批信息，状态为已通过", dto.getId()));
+        } else {
+            log.info("需获取待审核详情，id:{}审批信息，状态为未审核", dto.getId());
+            return BaseGenericsResponse.successBaseResp(dto);
+        }
     }
 
     /**
@@ -373,7 +390,7 @@ public class UserController {
      */
     @PostMapping("/acaAdmin/addCourse")
     @Permission(role = {RolePermissionEnum.ADMIN, RolePermissionEnum.EDUCATIONAL_MANAGER})
-    public BaseGenericsResponse<String> importCourse(BaseRequest baseRequest, @RequestParam("file") MultipartFile file) {
+    public BaseGenericsResponse<String> importCourse(BaseRequest baseRequest, @RequestParam("file") MultipartFile file) throws Exception {
         courseInfoService.importCourse(file);
         return BaseGenericsResponse.successBaseResp("导入成功");
     }

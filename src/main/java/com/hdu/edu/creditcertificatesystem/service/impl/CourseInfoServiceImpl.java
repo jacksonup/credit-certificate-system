@@ -1,8 +1,6 @@
 package com.hdu.edu.creditcertificatesystem.service.impl;
 
 import com.hdu.edu.creditcertificatesystem.constant.ErrorCodeConstant;
-import com.hdu.edu.creditcertificatesystem.constant.HSConstants;
-import com.hdu.edu.creditcertificatesystem.constant.RedisPrefixConstants;
 import com.hdu.edu.creditcertificatesystem.contract.LessonContract;
 import com.hdu.edu.creditcertificatesystem.enums.ContractTypeEnum;
 import com.hdu.edu.creditcertificatesystem.exception.BaseException;
@@ -12,12 +10,17 @@ import com.hdu.edu.creditcertificatesystem.spring.ContractLoader;
 import com.hdu.edu.creditcertificatesystem.util.ExcelUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.web3j.tuples.generated.Tuple2;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,15 +44,15 @@ public class CourseInfoServiceImpl implements CourseInfoService {
      * {@inheritDoc}
      */
     @Override
-    public void save(LessonContract.Lesson lesson, LessonContract.ExtraInfo extraInfo) {
-        lessonContract.save(lesson, extraInfo);
+    public void save(LessonContract.Lesson lesson, LessonContract.ExtraInfo extraInfo) throws Exception {
+        lessonContract.save(lesson, extraInfo).send();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void importCourse(MultipartFile file) {
+    public void importCourse(MultipartFile file) throws Exception {
         log.info("正在导入课程信息...");
         final List<Map<Integer, List<String>>> infoList = ExcelUtils.readExcel(file);
         HashSet<String> set = new HashSet<>();
@@ -70,13 +73,16 @@ public class CourseInfoServiceImpl implements CourseInfoService {
                 set.add(list.get(1));
 
                 // 获取主键Id
-                final String prefix = RedisPrefixConstants.ID + ":" + RedisPrefixConstants.LESSON_INFO;
-                if (null == redisValueOperations.get(prefix)) {
-                    redisValueOperations.set(prefix, 1);
-                }
-                Integer lessonId = redisValueOperations.getAndSet(prefix, redisValueOperations.get(prefix) + 1);
+                final BASE64Encoder encoder = new BASE64Encoder();
+                final BASE64Decoder decoder = new BASE64Decoder();
+                final String text = list.get(0) + list.get(1);
+                final byte[] textByte = text.getBytes("UTF-8");
+
+                // 编码
+                final String lessonId = encoder.encode(textByte);
+
                 LessonContract.Lesson lesson = new LessonContract.Lesson(
-                        String.valueOf(lessonId),
+                        lessonId,
                         list.get(0),
                         list.get(1),
                         list.get(2),
@@ -87,7 +93,7 @@ public class CourseInfoServiceImpl implements CourseInfoService {
                         new BigInteger(list.get(9)),
                         new BigInteger(list.get(10)),
                         new BigInteger(list.get(11)),
-                        new BigInteger(list.get(13))
+                        new BigInteger(list.get(12))
                 );
 
                 final LessonContract.ExtraInfo extraInfo = new LessonContract.ExtraInfo(
@@ -106,9 +112,34 @@ public class CourseInfoServiceImpl implements CourseInfoService {
      * {@inheritDoc}
      */
     @Override
-    public List<CourseInfoDTO> getListByStudentId(String studentId) {
-//        lessonContract.getListByStudentId(studentId).send();
+    public List<CourseInfoDTO> getListByStudentId(String studentId) throws Exception {
+        final Tuple2<List<LessonContract.Lesson>, List<LessonContract.ExtraInfo>> result = lessonContract.getListByStudentId(studentId).send();
+        final List<LessonContract.Lesson> lessons = result.getValue1();
+        final List<LessonContract.ExtraInfo> extraInfos = result.getValue2();
+        List<CourseInfoDTO> courseInfoDTOS = new ArrayList<>();
+        for (int i = 0; i < lessons.size(); i++) {
+            if (StringUtils.isBlank(lessons.get(i).getLessonId())) {
+                break;
+            }
 
-        return null;
+            CourseInfoDTO courseInfoDTO = new CourseInfoDTO();
+            courseInfoDTO.setLessonId(lessons.get(i).getLessonId());
+            courseInfoDTO.setStudentId(lessons.get(i).getStudentId());
+            courseInfoDTO.setLessonName(lessons.get(i).getLessonName());
+            courseInfoDTO.setOpenCollege(lessons.get(i).getOpenCollege());
+            courseInfoDTO.setRegularScore(lessons.get(i).getRegularScore().intValue());
+            courseInfoDTO.setMidTermScore(lessons.get(i).getMidTermScore().intValue());
+            courseInfoDTO.setFinalTermScore(lessons.get(i).getFinalTermScore().intValue());
+            courseInfoDTO.setFinalScore(lessons.get(i).getFinalScore().intValue());
+            courseInfoDTO.setCredit(lessons.get(i).getCredit().intValue());
+            courseInfoDTO.setPoint(lessons.get(i).getPoint().intValue());
+            courseInfoDTO.setCreditPoint(lessons.get(i).getCreditPoint().intValue());
+            courseInfoDTO.setTerm(lessons.get(i).getTerm().intValue());
+            courseInfoDTO.setIsReExam(extraInfos.get(i).getIsReExam());
+            courseInfoDTO.setIsRetake(extraInfos.get(i).getIsRetake());
+            courseInfoDTOS.add(courseInfoDTO);
+        }
+
+        return courseInfoDTOS;
     }
 }

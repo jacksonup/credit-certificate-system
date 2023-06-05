@@ -16,27 +16,31 @@ import java.math.BigInteger;
 @Setter
 @ToString
 public class CourseInfoDTO {
-    public String lessonId;
+    private String lessonId;
 
-    public String studentId;
+    private String studentId;
 
-    public String lessonName;
+    private String lessonName;
 
-    public String openCollege;
+    private String openCollege;
 
-    public Integer regularScore;
+    private Integer regularScore;
 
-    public Integer midTermScore;
+    private Integer midTermScore;
 
-    public Integer finalTermScore;
+    private Integer finalTermScore;
 
-    public Integer finalScore;
+    private Integer finalScore;
 
-    public Integer credit;
+    private Integer credit;
 
-    public Integer point;
+    private Integer point;
 
-    public Integer creditPoint;
+    private Integer creditPoint;
 
-    public Integer term;
+    private Integer term;
+
+    private Boolean isRetake;
+
+    private Boolean isReExam;
 }

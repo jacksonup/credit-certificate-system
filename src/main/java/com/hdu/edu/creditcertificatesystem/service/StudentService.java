@@ -51,5 +51,5 @@ public interface StudentService {
      * @param baseRequest 基础请求
      * @return 课程信息DTO列表
      */
-    BaseGenericsResponse<List<CourseInfoDTO>> getSchoolInfo(BaseRequest baseRequest);
+    BaseGenericsResponse<List<CourseInfoDTO>> getSchoolInfo(BaseRequest baseRequest) throws Exception;
 }

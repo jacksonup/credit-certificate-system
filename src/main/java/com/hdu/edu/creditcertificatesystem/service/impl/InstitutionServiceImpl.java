@@ -252,13 +252,19 @@ public class InstitutionServiceImpl implements InstitutionService {
         }
         final InstitutionContract.InstitutionInfo institutionInfo = result.getValue1();
         final InstitutionContract.ExtraInfo extraInfo = result.getValue2();
-        if (ObjectUtils.isEmpty(institutionInfo) || ObjectUtils.isEmpty(extraInfo)) {
+        if (StringUtils.isBlank(institutionInfo.getId()) || StringUtils.isBlank(extraInfo.getId())) {
             log.error("机构信息不存在");
             throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "机构信息不存在");
         }
         if (StringUtils.isBlank(institutionInfo.getInstitutionEmail())) {
             log.error("未绑定邮件");
             throw new BaseException("未绑定邮件");
+        }
+
+        // 已经审核通过了不可驳回
+        if (extraInfo.getStatus().intValue() == AuditTypeEnum.ACCESS.getKey()) {
+            log.info("该机构已经审核通过不可驳回");
+            throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "该机构已经审核通过不可驳回");
         }
 
         // 审核驳回，删除信息
@@ -269,9 +275,14 @@ public class InstitutionServiceImpl implements InstitutionService {
         AlarmMail alarmMail = new AlarmMail();
         AlarmContent alarmContent = new AlarmContent();
         alarmContent.setIsPass(false);
+        alarmContent.setRejectReason(institutionRequest.getReason());
         alarmMail.setAlarmContent(alarmContent);
         alarmMail.setReceivers(institutionInfo.getInstitutionEmail());
         alarmMailList.add(alarmMail);
+
+        // 异步发送邮件
+        ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
+        forkJoinPool.execute(() -> auditInformProcessor.sendMail(alarmMailList));
         return BaseGenericsResponse.successBaseResp("驳回成功");
     }
 
@@ -293,13 +304,43 @@ public class InstitutionServiceImpl implements InstitutionService {
             throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "机构信息不存在");
         }
 
+        // 如果已经审核通过不重复审核
+        if (extraInfo.getStatus().intValue() == AuditTypeEnum.ACCESS.getKey()) {
+            log.info("该机构已审核通过");
+            throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "该机构已审核通过，请勿重复审核");
+        }
+
         // 审核通过
         institutionInfo.setAccount(institutionInfo.getId() + "10000");
         institutionInfo.setPassword(institutionInfo.getId() + "10000");
         extraInfo.setAuditTime(new BigInteger(LocalDateTime.now().format(
                 DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))));
         extraInfo.setStatus(new BigInteger(String.valueOf(AuditTypeEnum.ACCESS.getKey())));
-        institutionContract.save(institutionInfo, extraInfo).send();
+
+        final InstitutionContract.InstitutionInfo newInstitutionInfo = new InstitutionContract.InstitutionInfo(
+                institutionInfo.getId(),
+                institutionInfo.getFacultyId(),
+                institutionInfo.getMajorId(),
+                institutionInfo.getAccount(),
+                institutionInfo.getPassword(),
+                institutionInfo.getInstitutionName(),
+                institutionInfo.getInstitutionPhone(),
+                institutionInfo.getInstitutionEmail(),
+                institutionInfo.getInstitutionPlace()
+        );
+
+        final InstitutionContract.ExtraInfo newExtraInfo = new InstitutionContract.ExtraInfo(
+                extraInfo.getId(),
+                extraInfo.getStatus(),
+                extraInfo.getAuthorCertificatePic(),
+                extraInfo.getCreateTime(),
+                extraInfo.getAuditTime(),
+                extraInfo.getMessage(),
+                extraInfo.getReason()
+        );
+
+        institutionContract.save(newInstitutionInfo, newExtraInfo).send();
+
 
         // 生成账号和密码
         UserInfoRequest userInfoRequest = new UserInfoRequest();

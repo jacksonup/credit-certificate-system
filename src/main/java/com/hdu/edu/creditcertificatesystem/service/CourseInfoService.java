@@ -19,14 +19,14 @@ public interface CourseInfoService {
      * @param lesson 课程信息
      * @param extraInfo 课程额外信息
      */
-    void save(LessonContract.Lesson lesson, LessonContract.ExtraInfo extraInfo);
+    void save(LessonContract.Lesson lesson, LessonContract.ExtraInfo extraInfo) throws Exception;
 
     /**
      * 导入课程信息
      *
      * @param file 文件
      */
-    void importCourse(MultipartFile file);
+    void importCourse(MultipartFile file) throws Exception;
 
     /**
      * 根据学生Id获取课程信息
@@ -34,5 +34,5 @@ public interface CourseInfoService {
      * @param studentId 学生Id
      * @return 课程信息DTO
      */
-    List<CourseInfoDTO> getListByStudentId(String studentId);
+    List<CourseInfoDTO> getListByStudentId(String studentId) throws Exception;
 }

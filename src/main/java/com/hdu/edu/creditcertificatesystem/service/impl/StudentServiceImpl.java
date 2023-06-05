@@ -135,13 +135,22 @@ public class StudentServiceImpl implements StudentService {
             List<StudentInfoDTO> students = new ArrayList<>();
             final List<StudentContract.StudentInfo> studentInfoList = listTuple2.getValue1();
             final List<StudentContract.ExtraInfo> extraInfoList = listTuple2.getValue2();
-            if (CollectionUtils.isEmpty(studentInfoList) || CollectionUtils.isEmpty(extraInfoList)) {
-                log.info("学生信息为空");
-                return BaseGenericsResponse.successBaseResp(pageStudentInfoDTO);
-            }
 
             for (int i = 0; i < studentInfoList.size(); i++) {
+                // 过滤空值
+                if (StringUtils.isBlank(studentInfoList.get(i).getAccount()) || StringUtils.isBlank(extraInfoList.get(i).getAccount())) {
+                    log.info("数据为空");
+                    break;
+                }
+
                 StudentInfoDTO studentInfoDTO = baseConvert.convertEx(studentInfoList.get(i), extraInfoList.get(i));
+
+                // 查询学生手机号和邮箱
+                UserInfoRequest userInfoRequest = new UserInfoRequest();
+                userInfoRequest.setAccount(studentInfoDTO.getAccount());
+                final UserInfoDTO userInfoDTO = userService.getDTO(userInfoRequest);
+                studentInfoDTO.setPhone(userInfoDTO.getPhone());
+                studentInfoDTO.setEmail(userInfoDTO.getEmail());
 
                 // 根据学生Id获取课程信息
                 studentInfoDTO.setCourses(courseInfoService.getListByStudentId(studentInfoList.get(i).getAccount()));
@@ -168,7 +177,10 @@ public class StudentServiceImpl implements StudentService {
 
         // 获取机构的权限
         InstitutionRequest institutionRequest = new InstitutionRequest();
-        institutionRequest.setId(institutionAccount);
+
+        // 截取末尾10000获得
+        final String id = institutionAccount.substring(0, institutionAccount.length() - 5);
+        institutionRequest.setId(id);
         final InstitutionDTO institutionDTO = institutionService.getDTO(institutionRequest);
         final List<Long> faculties = institutionDTO.getFaculties();
         final List<Long> majors = institutionDTO.getMajors();
@@ -182,6 +194,10 @@ public class StudentServiceImpl implements StudentService {
         final FacultyInfo facultyInfo = new LambdaQueryChainWrapper<>(facultyInfoMapper)
                 .eq(FacultyInfo::getFacultyName, studentInfoRequest.getDepartment())
                 .one();
+        if (ObjectUtils.isEmpty(facultyInfo)) {
+            log.error("学院不存在");
+            throw new BaseException(ErrorCodeConstant.CUSTOM_CODE, "学院不存在");
+        }
         final Integer facultyInfoId = facultyInfo.getId();
         boolean flag = false;
         for (Long l : faculties) {
@@ -229,7 +245,7 @@ public class StudentServiceImpl implements StudentService {
      * @return 课程信息列表
      */
     @Override
-    public BaseGenericsResponse<List<CourseInfoDTO>> getSchoolInfo(BaseRequest baseRequest) {
+    public BaseGenericsResponse<List<CourseInfoDTO>> getSchoolInfo(BaseRequest baseRequest) throws Exception {
         final String account = JwtUtils.getTokenInfo(baseRequest.getToken()).getClaim("account").asString();
         if (StringUtils.isBlank(account)) {
             log.error("Token中账号信息为空");

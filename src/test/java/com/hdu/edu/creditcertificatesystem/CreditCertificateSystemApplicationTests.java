@@ -23,8 +23,12 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple2;
 import org.web3j.tx.gas.StaticGasProvider;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -167,4 +171,27 @@ class CreditCertificateSystemApplicationTests {
         LocalDate createTime = LocalDate.parse(String.valueOf(time), formatter);
         System.out.println(createTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
     }
+
+    @Test
+    void test() throws IOException {
+        final BASE64Encoder encoder = new BASE64Encoder();
+        final BASE64Decoder decoder = new BASE64Decoder();
+        final String text = "19052240计算机";
+        final byte[] textByte = text.getBytes("UTF-8");
+
+        // 编码
+        final String encodedText = encoder.encode(textByte);
+        System.out.println(encodedText);
+
+        // 解码
+        System.out.println(new String(decoder.decodeBuffer(encodedText), "UTF-8"));
+    }
+
+    @Test
+    void testStr() {
+        String ids = "1910000";
+        final String id = ids.substring(0, ids.length() - 5);
+        System.out.println(id);
+    }
 }
+
