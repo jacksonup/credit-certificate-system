@@ -74,7 +74,6 @@ public class CourseInfoServiceImpl implements CourseInfoService {
 
                 // 获取主键Id
                 final BASE64Encoder encoder = new BASE64Encoder();
-                final BASE64Decoder decoder = new BASE64Decoder();
                 final String text = list.get(0) + list.get(1);
                 final byte[] textByte = text.getBytes("UTF-8");
 

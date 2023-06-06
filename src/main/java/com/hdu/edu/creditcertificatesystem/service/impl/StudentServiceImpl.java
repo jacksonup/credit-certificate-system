@@ -101,6 +101,9 @@ public class StudentServiceImpl implements StudentService {
                     final UserInfoDTO userInfoDTO = userService.getDTO(userInfoRequest);
                     studentInfoDTO.setPhone(userInfoDTO.getPhone());
                     studentInfoDTO.setEmail(userInfoDTO.getEmail());
+
+                    // 根据学生Id获取课程信息
+                    studentInfoDTO.setCourses(courseInfoService.getListByStudentId(studentInfoList.get(i).getAccount()));
                     result.add(studentInfoDTO);
                 }
             }

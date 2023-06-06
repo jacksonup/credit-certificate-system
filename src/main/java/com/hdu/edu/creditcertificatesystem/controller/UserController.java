@@ -125,6 +125,7 @@ public class UserController {
      * @return 学生信息列表
      */
     @GetMapping("/student/all")
+    @Permission(role = {RolePermissionEnum.EDUCATIONAL_MANAGER, RolePermissionEnum.ADMIN})
     public BaseGenericsResponse<List<StudentInfoDTO>> getAllStudent(PageRequest pageRequest) throws Exception {
         return BaseGenericsResponse.successBaseResp(studentService.getListPage(pageRequest));
     }

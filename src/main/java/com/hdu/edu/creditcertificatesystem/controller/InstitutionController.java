@@ -1,5 +1,6 @@
 package com.hdu.edu.creditcertificatesystem.controller;
 
+import com.hdu.edu.creditcertificatesystem.enums.AuditTypeEnum;
 import com.hdu.edu.creditcertificatesystem.enums.RolePermissionEnum;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.InstitutionDTO;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.PageInstitutionDTO;
@@ -19,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author chenyb46701
@@ -48,6 +50,10 @@ public class InstitutionController {
     @Permission(role = {RolePermissionEnum.ADMIN, RolePermissionEnum.INSTITUTE_MANAGER})
     public BaseGenericsResponse<PageInstitutionDTO> getAllInstitution(PageRequest pageRequest) throws Exception {
         final List<InstitutionDTO> listPage = institutionService.getListPage(pageRequest);
+
+        // 过滤未审批的数据
+        listPage.removeIf(institutionDTO -> Objects.equals(institutionDTO.getStatus(), AuditTypeEnum.WAIT_AUDIT.getKey()));
+
         PageInstitutionDTO pageInstitutionDTO = new PageInstitutionDTO();
         if (CollectionUtils.isEmpty(listPage)) {
             pageInstitutionDTO.setCount(0);
