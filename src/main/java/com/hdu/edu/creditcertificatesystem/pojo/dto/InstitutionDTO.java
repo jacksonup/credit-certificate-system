@@ -89,10 +89,10 @@ public class InstitutionDTO {
     /**
      * 学院id列表
      */
-    private List<Long> faculties;
+    private List<String> faculties;
 
     /**
      * 专业id列表
      */
-    private List<Long> majors;
+    private List<String> majors;
 }

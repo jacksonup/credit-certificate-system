@@ -1,11 +1,15 @@
 package com.hdu.edu.creditcertificatesystem.mapstruct.impl;
 
 import com.hdu.edu.creditcertificatesystem.contract.InstitutionContract;
+import com.hdu.edu.creditcertificatesystem.mapper.FacultyInfoMapper;
+import com.hdu.edu.creditcertificatesystem.mapper.MajorInfoMapper;
 import com.hdu.edu.creditcertificatesystem.mapstruct.InstitutionConvert;
 import com.hdu.edu.creditcertificatesystem.pojo.dto.InstitutionDTO;
 import com.hdu.edu.creditcertificatesystem.pojo.request.InstitutionRequest;
+import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -22,6 +26,13 @@ import java.util.List;
  */
 @Component
 public class InstitutionConvertImpl implements InstitutionConvert {
+    @Setter(onMethod_ = @Autowired)
+    private FacultyInfoMapper facultyInfoMapper;
+
+    @Setter(onMethod_ = @Autowired)
+    private MajorInfoMapper majorInfoMapper;
+
+
     /**
      * {@inheritDoc}
      */
@@ -82,20 +93,20 @@ public class InstitutionConvertImpl implements InstitutionConvert {
 
         // 设置学院名列表
         if (StringUtils.isNotBlank(institutionInfo.getFacultyId())) {
-            List<Long> list = new ArrayList<>();
+            List<String> list = new ArrayList<>();
             final String[] faculties = institutionInfo.getFacultyId().split(",");
             for (String s : faculties) {
-                list.add(Long.valueOf(s));
+                list.add(facultyInfoMapper.selectById(Long.valueOf(s)).getFacultyName());
             }
             institutionDTO.setFaculties(list);
         }
 
         // 设置专业名列表
         if (StringUtils.isNotBlank(institutionInfo.getMajorId())) {
-            List<Long> list = new ArrayList<>();
+            List<String> list = new ArrayList<>();
             final String[] majors = institutionInfo.getMajorId().split(",");
             for (String s : majors) {
-                list.add(Long.valueOf(s));
+                list.add(majorInfoMapper.selectById(Long.valueOf(s)).getMajorName());
             }
             institutionDTO.setMajors(list);
         }
