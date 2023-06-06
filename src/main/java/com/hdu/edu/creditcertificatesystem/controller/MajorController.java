@@ -62,7 +62,6 @@ public class MajorController {
      * @return 专业信息DTO列表
      */
     @GetMapping("/all")
-    @Permission(role = {RolePermissionEnum.ADMIN, RolePermissionEnum.EDUCATIONAL_MANAGER})
     public BaseGenericsResponse<List<MajorInfoDTO>> getAllList(BaseRequest baseRequest) {
         return majorInfoService.getAllList(baseRequest);
     }

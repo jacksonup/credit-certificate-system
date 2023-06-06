@@ -50,7 +50,6 @@ public class FacultyController {
      * @return 学院信息列表
      */
     @GetMapping("/all")
-    @Permission(role = {RolePermissionEnum.ADMIN, RolePermissionEnum.EDUCATIONAL_MANAGER})
     public BaseGenericsResponse<List<FacultyInfoDTO>> getAllList(BaseRequest baseRequest) {
         return facultyInfoService.getAllList(baseRequest);
     }
