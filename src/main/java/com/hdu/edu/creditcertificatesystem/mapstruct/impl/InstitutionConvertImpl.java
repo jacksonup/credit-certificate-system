@@ -93,21 +93,27 @@ public class InstitutionConvertImpl implements InstitutionConvert {
 
         // 设置学院名列表
         if (StringUtils.isNotBlank(institutionInfo.getFacultyId())) {
-            List<String> list = new ArrayList<>();
+            List<Long> list = new ArrayList<>();
+            List<String> stringList = new ArrayList<>();
             final String[] faculties = institutionInfo.getFacultyId().split(",");
             for (String s : faculties) {
-                list.add(facultyInfoMapper.selectById(Long.valueOf(s)).getFacultyName());
+                stringList.add(facultyInfoMapper.selectById(Long.valueOf(s)).getFacultyName());
+                list.add(Long.valueOf(s));
             }
             institutionDTO.setFaculties(list);
+            institutionDTO.setFacultyNameList(stringList);
         }
 
         // 设置专业名列表
         if (StringUtils.isNotBlank(institutionInfo.getMajorId())) {
-            List<String> list = new ArrayList<>();
+            List<Long> list = new ArrayList<>();
+            List<String> stringList = new ArrayList<>();
             final String[] majors = institutionInfo.getMajorId().split(",");
             for (String s : majors) {
-                list.add(majorInfoMapper.selectById(Long.valueOf(s)).getMajorName());
+                stringList.add(majorInfoMapper.selectById(Long.valueOf(s)).getMajorName());
+                list.add(Long.valueOf(s));
             }
+            institutionDTO.setMajorNameList(stringList);
             institutionDTO.setMajors(list);
         }
 
